@@ -10,8 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 0) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_05_213449) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
+  create_table "appointments", force: :cascade do |t|
+    t.bigint "availability_slot_id", null: false
+    t.string "booking_name", null: false
+    t.string "booking_email", null: false
+    t.string "booking_phone"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["availability_slot_id"], name: "index_appointments_on_availability_slot_id"
+  end
+
+  create_table "availability_slots", force: :cascade do |t|
+    t.datetime "starts_at"
+    t.datetime "ends_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 end

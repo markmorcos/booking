@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1><%= t('appointment_mailer.completion_email.title') %></h1>
+    <p>
+      <%= t('appointment_mailer.completion_email.greeting', name: @appointment.booking_name) %>
+    </p>
+    <p>
+      <%= t('appointment_mailer.completion_email.message') %>
+    </p>
+    <p>
+      <strong><%= t('appointment_mailer.common.details') %>:</strong>
+      <ul>
+        <li><%= t('appointment_mailer.common.date') %>: <%= l(@appointment.availability_slot.starts_at.to_date, format: :long, locale: I18n.locale) %></li>
+        <li><%= t('appointment_mailer.common.time') %>: <%= l(@appointment.availability_slot.starts_at, format: :default, locale: I18n.locale) %> - <%= l(@appointment.availability_slot.ends_at, format: :default, locale: I18n.locale) %></li>
+      </ul>
+    </p>
+    <p>
+      <%= t('appointment_mailer.completion_email.feedback') %>
+    </p>
+    <p>
+      <%= t('appointment_mailer.completion_email.closing') %>
+    </p>
+    <p>
+      <%= simple_format(t('appointment_mailer.common.signature')) %>
+    </p>
+  </body>
+</html> 
