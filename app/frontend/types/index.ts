@@ -5,18 +5,22 @@ export interface AvailabilitySlot {
   id: number;
   start_time: string;
   end_time: string;
-  booked: boolean;
+  is_available: boolean;
+  created_at: string;
+  updated_at: string;
+  appointment_id: number | null;
 }
 
 // Appointment type
 export interface Appointment {
   id: number;
-  status: "pending" | "confirmed" | "cancelled";
   name: string;
   email: string;
   phone: string;
-  notes?: string;
+  notes: string | null;
+  status: "pending" | "confirmed" | "cancelled";
   created_at: string;
+  updated_at: string;
   slot: {
     id: number;
     start_time: string;
@@ -38,6 +42,10 @@ export interface AdminUser {
   id: number;
   name: string;
   email: string;
+  created_at: string;
+  updated_at: string;
+  last_sign_in_at: string | null;
+  sign_in_count: number;
 }
 
 // API response types
