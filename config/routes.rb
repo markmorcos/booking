@@ -9,6 +9,34 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # API Endpoints
+  namespace :api do
+    # Public endpoints
+    resources :availability_slots, only: [ :index ]
+    resources :appointments, only: [ :create ]
+
+    # Admin endpoints
+    namespace :admin do
+      resources :availability_slots do
+        collection do
+          post :create_batch
+          patch :update_durations
+          delete :delete_range
+        end
+      end
+
+      resources :appointments, only: [ :index, :show ] do
+        member do
+          patch :approve
+          patch :cancel
+          patch :reschedule
+          patch :complete
+          patch :mark_no_show
+        end
+      end
+    end
+  end
+
   # Defines the root path route ("/")
   # root "posts#index"
 end
