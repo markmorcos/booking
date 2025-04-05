@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Fr Youhanna Makin" %></title>
+    <title>Fr. Youhanna Makin - Appointment Booking</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -20,9 +20,31 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <%= vite_client_tag %>
+    <%= vite_javascript_tag 'application' %>
+    <%# Add this to make styles work in development mode %>
+    <%# vite_stylesheet_tag 'application' %>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   </head>
 
   <body>
-    <%= yield %>
+    <div class="flash-messages">
+      <% flash.each do |type, message| %>
+        <div class="flash flash-<%= type %>">
+          <%= message %>
+        </div>
+      <% end %>
+    </div>
+
+    <main class="container">
+      <%= yield %>
+    </main>
+
+    <footer class="main-footer">
+      <div class="container">
+        <p>&copy; <%= Date.today.year %> Fr. Youhanna Makin. All rights reserved.</p>
+      </div>
+    </footer>
   </body>
 </html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Dashboard - Fr. Youhanna Makin</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= vite_client_tag %>
+    <%= vite_javascript_tag 'admin' %>
+    <%# Add this to make styles work in development mode %>
+    <%# vite_stylesheet_tag 'admin' %>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  </head>
+
+  <body class="admin">
+    <header class="admin-header">
+      <div class="container">
+        <div class="logo">
+          <%= link_to "Fr. Youhanna Makin", admin_root_path %>
+        </div>
+        
+        <% if admin_user_signed_in? %>
+          <nav class="admin-nav">
+            <ul>
+              <li><%= link_to "Dashboard", admin_dashboard_path %></li>
+              <li><%= link_to "Appointments", admin_appointments_path %></li>
+              <li><%= link_to "Availability Slots", admin_availability_slots_path %></li>
+              <li><%= link_to "Admin Users", admin_admin_users_path %></li>
+              <li>
+                <%= button_to "Sign Out", destroy_admin_user_session_path, method: :delete, class: "sign-out-btn" %>
+              </li>
+            </ul>
+          </nav>
+        <% end %>
+      </div>
+    </header>
+
+    <div class="flash-messages">
+      <% flash.each do |type, message| %>
+        <div class="flash flash-<%= type %>">
+          <%= message %>
+        </div>
+      <% end %>
+    </div>
+
+    <main class="admin-content container">
+      <% if admin_user_signed_in? %>
+        <h1 class="page-title"><%= content_for(:title) || "Admin Dashboard" %></h1>
+      <% end %>
+      
+      <%= yield %>
+    </main>
+
+    <div id="admin-app"></div>
+
+    <footer class="admin-footer">
+      <div class="container">
+        <p>&copy; <%= Date.today.year %> Fr. Youhanna Makin. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html> 

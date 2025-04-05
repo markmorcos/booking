@@ -1,0 +1,152 @@
+<% content_for :title, "Dashboard" %>
+
+<div class="dashboard-summary">
+  <div class="summary-card">
+    <div class="summary-title">Total Appointments</div>
+    <div class="summary-value"><%= Appointment.count %></div>
+  </div>
+  
+  <div class="summary-card">
+    <div class="summary-title">Pending Appointments</div>
+    <div class="summary-value"><%= @total_pending %></div>
+  </div>
+  
+  <div class="summary-card">
+    <div class="summary-title">Confirmed Appointments</div>
+    <div class="summary-value"><%= @total_confirmed %></div>
+  </div>
+  
+  <div class="summary-card">
+    <div class="summary-title">Cancelled Appointments</div>
+    <div class="summary-value"><%= @total_cancelled %></div>
+  </div>
+  
+  <div class="summary-card">
+    <div class="summary-title">Available Slots</div>
+    <div class="summary-value"><%= @available_slots %></div>
+  </div>
+  
+  <div class="summary-card">
+    <div class="summary-title">Total Slots</div>
+    <div class="summary-value"><%= @total_slots %></div>
+  </div>
+</div>
+
+<div class="dashboard-sections">
+  <section class="dashboard-section">
+    <div class="section-header">
+      <h2>Today's Appointments</h2>
+      <%= link_to "View All", admin_appointments_path, class: "view-all" %>
+    </div>
+    
+    <div class="section-content">
+      <% if @today_appointments.any? %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @today_appointments.each do |appointment| %>
+              <tr>
+                <td><%= appointment.start_time.strftime("%I:%M %p") %></td>
+                <td><%= appointment.name %></td>
+                <td><%= appointment.email %></td>
+                <td><span class="status status-<%= appointment.status %>"><%= appointment.status.capitalize %></span></td>
+                <td class="actions">
+                  <%= link_to "View", admin_appointment_path(appointment), class: "btn small" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p class="empty-state">No appointments scheduled for today.</p>
+      <% end %>
+    </div>
+  </section>
+  
+  <section class="dashboard-section">
+    <div class="section-header">
+      <h2>Pending Appointments</h2>
+      <%= link_to "View All", admin_appointments_path(status: "pending"), class: "view-all" %>
+    </div>
+    
+    <div class="section-content">
+      <% if @pending_appointments.any? %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @pending_appointments.each do |appointment| %>
+              <tr>
+                <td><%= appointment.start_time.strftime("%b %d, %Y at %I:%M %p") %></td>
+                <td><%= appointment.name %></td>
+                <td><%= appointment.email %></td>
+                <td class="actions">
+                  <%= link_to "View", admin_appointment_path(appointment), class: "btn small" %>
+                  <%= button_to "Confirm", confirm_admin_appointment_path(appointment), method: :patch, class: "btn small success" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p class="empty-state">No pending appointments.</p>
+      <% end %>
+    </div>
+  </section>
+  
+  <section class="dashboard-section">
+    <div class="section-header">
+      <h2>Upcoming Appointments</h2>
+      <%= link_to "View All", admin_appointments_path, class: "view-all" %>
+    </div>
+    
+    <div class="section-content">
+      <% if @upcoming_appointments.any? %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @upcoming_appointments.each do |appointment| %>
+              <tr>
+                <td><%= appointment.start_time.strftime("%b %d, %Y at %I:%M %p") %></td>
+                <td><%= appointment.name %></td>
+                <td><%= appointment.email %></td>
+                <td><span class="status status-<%= appointment.status %>"><%= appointment.status.capitalize %></span></td>
+                <td class="actions">
+                  <%= link_to "View", admin_appointment_path(appointment), class: "btn small" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p class="empty-state">No upcoming appointments.</p>
+      <% end %>
+    </div>
+  </section>
+</div>
+
+<div class="dashboard-actions">
+  <%= link_to "Create Availability Slot", new_admin_availability_slot_path, class: "btn primary-btn" %>
+</div> 
