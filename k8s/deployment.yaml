@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fr-youhanna-makin
+  labels:
+    app: fr-youhanna-makin
+spec:
+  replicas: 2 # Number of pods to run
+  selector:
+    matchLabels:
+      app: fr-youhanna-makin
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1 # Number of pods that can be created above the desired amount
+      maxUnavailable: 0 # Number of pods that can be unavailable during the update
+  template:
+    metadata:
+      labels:
+        app: fr-youhanna-makin
+    spec:
+      containers:
+        - name: fr-youhanna-makin
+          image: ${DOCKER_USERNAME}/fr-youhanna-makin:${IMAGE_TAG} # Will be replaced by the CI/CD pipeline
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              name: http
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: fr-youhanna-makin-secrets
+                  key: database-url
+            - name: RAILS_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fr-youhanna-makin-secrets
+                  key: rails-master-key
+            - name: RAILS_SERVE_STATIC_FILES
+              value: "true"
+            - name: RAILS_LOG_TO_STDOUT
+              value: "true"
+            - name: ADMIN_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: fr-youhanna-makin-config
+                  key: admin-email
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fr-youhanna-makin-secrets
+                  key: admin-password
+          readinessProbe:
+            httpGet:
+              path: /up
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /up
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+      imagePullSecrets:
+        - name: dockerhub-secret # Secret containing Docker Hub credentials

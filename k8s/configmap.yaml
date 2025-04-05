@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fr-youhanna-makin-config
+data:
+  admin-email: "admin@fryouhannamakin.com"
+  rails-env: "production"
+  rails-log-level: "info"
+  default-url-host: "fryouhannamakin.com"
+  admin-url-host: "admin.fryouhannamakin.com"
