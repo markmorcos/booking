@@ -30,7 +30,7 @@ export default function SlotCard({ slot, onSelect }: SlotCardProps) {
     >
       <View style={[styles.card, !slot.available && styles.unavailable]}>
         <View style={styles.dateRow}>
-          <Text style={styles.date}>{formatDate(slot.starts_at)}</Text>
+          <Text style={styles.date}>{formatDate(slot.startsAt)}</Text>
           {!slot.available && (
             <View style={styles.unavailableBadge}>
               <Text style={styles.unavailableText}>Unavailable</Text>
@@ -47,13 +47,11 @@ export default function SlotCard({ slot, onSelect }: SlotCardProps) {
               style={styles.icon}
             />
             <Text style={styles.time}>
-              {formatTime(slot.starts_at)} - {formatTime(slot.ends_at)}
+              {formatTime(slot.startsAt)} - {formatTime(slot.endsAt)}
             </Text>
           </View>
 
-          <Text style={styles.duration}>
-            ({formatSlotDuration(slot.starts_at, slot.ends_at)})
-          </Text>
+          <Text style={styles.duration}>({slot.durationMinutes} minutes)</Text>
         </View>
 
         {slot.available ? (

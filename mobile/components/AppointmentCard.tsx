@@ -21,7 +21,7 @@ export default function AppointmentCard({ appointment }: AppointmentCardProps) {
     <View style={styles.container}>
       <View style={styles.header}>
         <StatusBadge status={appointment.status} />
-        <Text style={styles.name}>{appointment.booking_name}</Text>
+        <Text style={styles.name}>{appointment.bookingName}</Text>
       </View>
 
       <View style={styles.detailsContainer}>
@@ -33,7 +33,7 @@ export default function AppointmentCard({ appointment }: AppointmentCardProps) {
             style={styles.icon}
           />
           <Text style={styles.detailText}>
-            {formatDate(appointment.availability_slot.starts_at)}
+            {formatDate(appointment.availabilitySlot.startsAt)}
           </Text>
         </View>
 
@@ -45,8 +45,8 @@ export default function AppointmentCard({ appointment }: AppointmentCardProps) {
             style={styles.icon}
           />
           <Text style={styles.detailText}>
-            {formatTime(appointment.availability_slot.starts_at)} -{" "}
-            {formatTime(appointment.availability_slot.ends_at)}
+            {formatTime(appointment.availabilitySlot.startsAt)} -{" "}
+            {formatTime(appointment.availabilitySlot.endsAt)}
           </Text>
         </View>
 
@@ -57,10 +57,10 @@ export default function AppointmentCard({ appointment }: AppointmentCardProps) {
             color={Colors.primary}
             style={styles.icon}
           />
-          <Text style={styles.detailText}>{appointment.booking_email}</Text>
+          <Text style={styles.detailText}>{appointment.bookingEmail}</Text>
         </View>
 
-        {appointment.booking_phone && (
+        {appointment.bookingPhone && (
           <View style={styles.detailRow}>
             <Feather
               name="phone"
@@ -68,7 +68,7 @@ export default function AppointmentCard({ appointment }: AppointmentCardProps) {
               color={Colors.primary}
               style={styles.icon}
             />
-            <Text style={styles.detailText}>{appointment.booking_phone}</Text>
+            <Text style={styles.detailText}>{appointment.bookingPhone}</Text>
           </View>
         )}
       </View>

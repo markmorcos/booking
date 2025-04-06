@@ -25,21 +25,22 @@ import { Feather } from "@expo/vector-icons";
 export default function BookingScreen() {
   const router = useRouter();
   const { slotId } = useLocalSearchParams();
+  console.log("Slot ID", slotId);
   const [slot, setSlot] = useState<AvailabilitySlot | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<BookingFormData>({
-    booking_name: "",
-    booking_email: "",
-    booking_phone: "",
-    availability_slot_id: Number(slotId),
+    bookingName: "",
+    bookingEmail: "",
+    bookingPhone: "",
+    availabilitySlotId: Number(slotId),
   });
 
   const [formErrors, setFormErrors] = useState({
-    booking_name: "",
-    booking_email: "",
+    bookingName: "",
+    bookingEmail: "",
   });
 
   useEffect(() => {
@@ -47,7 +48,7 @@ export default function BookingScreen() {
       try {
         setLoading(true);
         const slots = await getAvailableSlots();
-        const selectedSlot = slots.find((s) => s.id === Number(slotId));
+        const selectedSlot = slots.find((s) => s.id === slotId);
 
         if (!selectedSlot) {
           setError("Slot not found or no longer available");
@@ -61,10 +62,9 @@ export default function BookingScreen() {
 
         setSlot(selectedSlot);
 
-        // Pre-fill email from local storage if available
         const savedEmail = await AsyncStorage.getItem("userEmail");
         if (savedEmail) {
-          setFormData((prev) => ({ ...prev, booking_email: savedEmail }));
+          setFormData((prev) => ({ ...prev, bookingEmail: savedEmail }));
         }
       } catch (err) {
         setError("Failed to load slot details");
@@ -79,25 +79,25 @@ export default function BookingScreen() {
 
   const validateForm = (): boolean => {
     const errors = {
-      booking_name: "",
-      booking_email: "",
+      bookingName: "",
+      bookingEmail: "",
     };
 
     let isValid = true;
 
     // Validate name
-    if (!formData.booking_name.trim()) {
-      errors.booking_name = "Name is required";
+    if (!formData.bookingName.trim()) {
+      errors.bookingName = "Name is required";
       isValid = false;
     }
 
     // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.booking_email.trim()) {
-      errors.booking_email = "Email is required";
+    if (!formData.bookingEmail.trim()) {
+      errors.bookingEmail = "Email is required";
       isValid = false;
-    } else if (!emailRegex.test(formData.booking_email)) {
-      errors.booking_email = "Please enter a valid email";
+    } else if (!emailRegex.test(formData.bookingEmail)) {
+      errors.bookingEmail = "Please enter a valid email";
       isValid = false;
     }
 
@@ -171,9 +171,9 @@ export default function BookingScreen() {
       >
         <View style={styles.slotInfoCard}>
           <Text style={styles.sectionTitle}>Selected Time Slot</Text>
-          <Text style={styles.dateTime}>{formatDateTime(slot.starts_at)}</Text>
+          <Text style={styles.dateTime}>{formatDateTime(slot.startsAt)}</Text>
           <Text style={styles.duration}>
-            Duration: {formatSlotDuration(slot.starts_at, slot.ends_at)}
+            Duration: {slot.durationMinutes} minutes
           </Text>
         </View>
 
@@ -185,16 +185,16 @@ export default function BookingScreen() {
             <TextInput
               style={[
                 styles.input,
-                formErrors.booking_name ? styles.inputError : null,
+                formErrors.bookingName ? styles.inputError : null,
               ]}
               placeholder="Enter your full name"
-              value={formData.booking_name}
+              value={formData.bookingName}
               onChangeText={(text) =>
-                setFormData({ ...formData, booking_name: text })
+                setFormData({ ...formData, bookingName: text })
               }
             />
-            {formErrors.booking_name ? (
-              <Text style={styles.errorMessage}>{formErrors.booking_name}</Text>
+            {formErrors.bookingName ? (
+              <Text style={styles.errorMessage}>{formErrors.bookingName}</Text>
             ) : null}
           </View>
 
@@ -203,20 +203,18 @@ export default function BookingScreen() {
             <TextInput
               style={[
                 styles.input,
-                formErrors.booking_email ? styles.inputError : null,
+                formErrors.bookingEmail ? styles.inputError : null,
               ]}
               placeholder="Enter your email address"
               keyboardType="email-address"
               autoCapitalize="none"
-              value={formData.booking_email}
+              value={formData.bookingEmail}
               onChangeText={(text) =>
-                setFormData({ ...formData, booking_email: text })
+                setFormData({ ...formData, bookingEmail: text })
               }
             />
-            {formErrors.booking_email ? (
-              <Text style={styles.errorMessage}>
-                {formErrors.booking_email}
-              </Text>
+            {formErrors.bookingEmail ? (
+              <Text style={styles.errorMessage}>{formErrors.bookingEmail}</Text>
             ) : null}
           </View>
 
@@ -226,9 +224,9 @@ export default function BookingScreen() {
               style={styles.input}
               placeholder="Enter your phone number"
               keyboardType="phone-pad"
-              value={formData.booking_phone}
+              value={formData.bookingPhone}
               onChangeText={(text) =>
-                setFormData({ ...formData, booking_phone: text })
+                setFormData({ ...formData, bookingPhone: text })
               }
             />
           </View>

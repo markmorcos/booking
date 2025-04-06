@@ -10,54 +10,89 @@ const getApiUrl = () => {
   const configuredUrl = Constants.expoConfig?.extra?.apiUrl;
   if (configuredUrl) return configuredUrl;
 
+  // get current ip
   if (__DEV__) {
-    // Development environment
-    if (Platform.OS === "ios") {
-      return "http://localhost:3000/api";
-    } else if (Platform.OS === "android") {
-      return "http://192.168.1.6:3000/api";
-    }
+    return "http://192.168.1.20:3000/api";
   }
 
-  return "http://127.0.0.1:3000/api";
+  return "http://localhost:3000/api";
 };
 
 const API_URL = getApiUrl();
-console.log(`Using API URL: ${API_URL}`);
-
-// Types based on Rails models
 export interface AvailabilitySlot {
-  id: number;
-  starts_at: string;
-  ends_at: string;
+  id: string;
+  startsAt: string;
+  endsAt: string;
   available: boolean;
+  durationMinutes: number;
+  future: boolean;
+  appointment: {
+    id: number;
+    bookingName: string;
+    bookingEmail: string;
+    bookingPhone?: string;
+    status: "pending" | "confirmed" | "cancelled" | "completed" | "no_show";
+  } | null;
+}
+
+export interface AvailabilitySlotPayload {
+  id: string;
+  type: "availabilitySlots";
+  attributes: {
+    startsAt: string;
+    endsAt: string;
+    durationMinutes: number;
+    available: boolean;
+    future: boolean;
+  };
+  relationships: {
+    appointment: {
+      data: object | null;
+    };
+  };
 }
 
 export interface Appointment {
   id: number;
-  booking_name: string;
-  booking_email: string;
-  booking_phone?: string;
+  bookingName: string;
+  bookingEmail: string;
+  bookingPhone?: string;
   status: "pending" | "confirmed" | "cancelled" | "completed" | "no_show";
-  availability_slot_id: number;
-  availability_slot: {
-    starts_at: string;
-    ends_at: string;
+  availabilitySlotId: number;
+  availabilitySlot: AvailabilitySlot;
+}
+
+export interface AppointmentPayload {
+  id: string;
+  type: "appointments";
+  attributes: {
+    bookingName: string;
+    bookingEmail: string;
+    bookingPhone?: string;
+    status: "pending" | "confirmed" | "cancelled" | "completed" | "no_show";
+    createdAt: string;
+    updatedAt: string;
+    availabilitySlot: AvailabilitySlotPayload["attributes"];
+  };
+  relationships: {
+    availabilitySlot: {
+      data: {
+        id: number;
+        type: "availabilitySlots";
+      };
+    };
   };
 }
 
 export interface BookingFormData {
-  booking_name: string;
-  booking_email: string;
-  booking_phone?: string;
-  availability_slot_id: number;
+  bookingName: string;
+  bookingEmail: string;
+  bookingPhone?: string;
+  availabilitySlotId: number;
 }
 
 export const getAvailableSlots = async (): Promise<AvailabilitySlot[]> => {
   try {
-    console.log(
-      `Fetching availability slots from ${API_URL}/availability_slots`
-    );
     const response = await fetch(`${API_URL}/availability_slots`, {
       headers: {
         Accept: "application/json",
@@ -73,7 +108,19 @@ export const getAvailableSlots = async (): Promise<AvailabilitySlot[]> => {
       );
     }
 
-    return response.json();
+    const { data } = await response.json();
+
+    const slots = data.map((slot: AvailabilitySlotPayload) => ({
+      id: slot.id,
+      startsAt: slot.attributes.startsAt,
+      endsAt: slot.attributes.endsAt,
+      available: slot.attributes.available,
+      durationMinutes: slot.attributes.durationMinutes,
+      future: slot.attributes.future,
+      appointment: slot.relationships.appointment.data,
+    }));
+
+    return slots;
   } catch (error) {
     console.error("Error fetching availability slots:", error);
     throw error;
@@ -90,7 +137,12 @@ export const createAppointment = async (
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ appointment: data }),
+      body: JSON.stringify({
+        booking_name: data.bookingName,
+        booking_email: data.bookingEmail,
+        booking_phone: data.bookingPhone,
+        availability_slot_id: data.availabilitySlotId,
+      }),
     });
 
     if (!response.ok) {
@@ -101,7 +153,7 @@ export const createAppointment = async (
 
     const appointment = await response.json();
 
-    await AsyncStorage.setItem("userEmail", data.booking_email);
+    await AsyncStorage.setItem("userEmail", data.bookingEmail);
 
     return appointment;
   } catch (error) {
@@ -131,7 +183,18 @@ export const getUserAppointments = async (): Promise<Appointment[]> => {
       throw new Error(`Failed to fetch appointments (${response.status})`);
     }
 
-    return response.json();
+    const { data, included } = await response.json();
+
+    const appointments = data.map((appointment: AppointmentPayload) => ({
+      id: appointment.id,
+      bookingName: appointment.attributes.bookingName,
+      bookingEmail: appointment.attributes.bookingEmail,
+      bookingPhone: appointment.attributes.bookingPhone,
+      status: appointment.attributes.status,
+      availabilitySlot: appointment.attributes.availabilitySlot,
+    }));
+
+    return appointments;
   } catch (error) {
     console.error("Error fetching user appointments:", error);
     // Return empty array instead of throwing to avoid crashes in the UI

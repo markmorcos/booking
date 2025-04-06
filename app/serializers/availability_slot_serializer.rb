@@ -1,5 +1,6 @@
 class AvailabilitySlotSerializer < ActiveModel::Serializer
   attributes :id, :starts_at, :ends_at, :duration_minutes, :available, :future
+
   has_one :appointment
 
   def available

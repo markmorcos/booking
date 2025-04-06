@@ -14,8 +14,9 @@ module Api
       end
 
       @availability_slots = @availability_slots.order(starts_at: :asc)
+      
 
-      render json: @availability_slots
+      render json: @availability_slots, status: :ok
     end
   end
 end

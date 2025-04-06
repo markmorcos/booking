@@ -1,6 +1,8 @@
 module Api
   class BaseController < ApplicationController
     protect_from_forgery with: :null_session
+    skip_before_action :verify_authenticity_token
+
     rescue_from ActiveRecord::RecordNotFound, with: :not_found
     rescue_from ActiveRecord::RecordInvalid, with: :record_invalid
 

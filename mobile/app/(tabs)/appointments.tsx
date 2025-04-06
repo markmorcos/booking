@@ -41,7 +41,9 @@ export default function AppointmentsScreen() {
       setError(null);
     } catch (err) {
       console.error("Error in fetchAppointments:", err);
-      setError("Failed to load appointments. Please check your network connection and try again.");
+      setError(
+        "Failed to load appointments. Please check your network connection and try again."
+      );
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -63,7 +65,7 @@ export default function AppointmentsScreen() {
   };
 
   const showNetworkTroubleshooting = () => {
-    const platform = Platform.OS === 'ios' ? 'iOS' : 'Android';
+    const platform = Platform.OS === "ios" ? "iOS" : "Android";
     Alert.alert(
       "Network Troubleshooting",
       `Make sure that:\n\n1. Your ${platform} device is connected to the internet\n2. The backend server is running (Rails)\n3. Your device can reach the server\n\nIf using an emulator, make sure the server is running on the correct port (default: 3000).`,
@@ -89,7 +91,10 @@ export default function AppointmentsScreen() {
           <TouchableOpacity style={styles.button} onPress={handleRetry}>
             <Text style={styles.buttonText}>Try Again</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.helpButton]} onPress={showNetworkTroubleshooting}>
+          <TouchableOpacity
+            style={[styles.button, styles.helpButton]}
+            onPress={showNetworkTroubleshooting}
+          >
             <Text style={styles.buttonText}>Help</Text>
           </TouchableOpacity>
         </View>
@@ -112,7 +117,7 @@ export default function AppointmentsScreen() {
   if (appointments.length === 0) {
     return (
       <View style={styles.centered}>
-        <Feather name="calendar-x" size={48} color={Colors.textLight} />
+        <Feather name="calendar" size={48} color={Colors.textLight} />
         <Text style={styles.emptyText}>No appointments found</Text>
         <Text style={styles.emptySubText}>
           You haven't booked any appointments yet
@@ -169,7 +174,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   buttonContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: Spacing.sm,
   },
   button: {
@@ -184,7 +189,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   emptyText: {
     marginTop: Spacing.md,

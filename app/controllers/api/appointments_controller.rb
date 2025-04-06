@@ -2,8 +2,12 @@ module Api
   class AppointmentsController < Api::BaseController
     # GET /api/appointments
     def index
-      @appointments = Appointment.where(booking_email: params[:email])
-      render json: { data: @appointments }, status: :ok
+      @appointments = Appointment
+                        .where(booking_email: params[:email])
+                        .includes(:availability_slot)
+                        .future
+
+      render json: @appointments, status: :ok
     end
     
     # POST /api/appointments
@@ -30,7 +34,7 @@ module Api
 
       if @appointment.save
         AppointmentMailer.pending_email(@appointment).deliver_later
-        render json: { data: @appointment }, status: :created
+        render json: @appointment, status: :created
       else
         render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
       end
@@ -39,7 +43,7 @@ module Api
     private
 
     def appointment_params
-      params.require(:appointment).permit(:booking_name, :booking_email, :booking_phone)
+      params.require(:appointment).permit(:booking_name, :booking_email, :booking_phone, :status)
     end
   end
 end

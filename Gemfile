@@ -19,6 +19,15 @@ gem "jbuilder"
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem "rack-cors"
 
+# Flexible authentication solution for Rails with Warden
+gem "devise"
+
+# CSS framework for rapid UI development
+gem "tailwindcss-rails"
+
+# Pagination
+gem "kaminari"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 

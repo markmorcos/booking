@@ -1,0 +1,81 @@
+<%= form_with(model: [:admin, availability_slot], class: "space-y-6") do |form| %>
+  <% if availability_slot.errors.any? %>
+    <div class="rounded-md bg-red-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <i class="fas fa-exclamation-circle text-red-400"></i>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            <%= pluralize(availability_slot.errors.count, "error") %> prohibited this availability slot from being saved:
+          </h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <% availability_slot.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+    <div class="sm:col-span-3">
+      <%= form.label :starts_at, "Start Date and Time", class: "block text-sm font-medium text-gray-700" %>
+      <div class="mt-1">
+        <%= form.datetime_local_field :starts_at, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
+      </div>
+    </div>
+
+    <div class="sm:col-span-3">
+      <%= form.label :ends_at, "End Date and Time", class: "block text-sm font-medium text-gray-700" %>
+      <div class="mt-1">
+        <%= form.datetime_local_field :ends_at, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
+      </div>
+    </div>
+
+    <div class="sm:col-span-6">
+      <div class="text-sm text-gray-500">
+        <p>Duration: <span id="duration-display"><%= availability_slot.new_record? ? "" : "#{availability_slot.duration_minutes} minutes" %></span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end space-x-3">
+    <%= link_to "Cancel", availability_slot.persisted? ? admin_availability_slot_path(availability_slot) : admin_availability_slots_path, class: "bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+    <%= form.submit class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+  </div>
+<% end %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const startsAtField = document.querySelector('input[name="availability_slot[starts_at]"]');
+    const endsAtField = document.querySelector('input[name="availability_slot[ends_at]"]');
+    const durationDisplay = document.getElementById('duration-display');
+
+    function calculateDuration() {
+      if (startsAtField.value && endsAtField.value) {
+        const startTime = new Date(startsAtField.value);
+        const endTime = new Date(endsAtField.value);
+        
+        if (!isNaN(startTime) && !isNaN(endTime) && endTime > startTime) {
+          const durationMs = endTime - startTime;
+          const durationMinutes = Math.round(durationMs / (1000 * 60));
+          durationDisplay.textContent = `${durationMinutes} minutes`;
+        } else {
+          durationDisplay.textContent = "End time must be after start time";
+        }
+      } else {
+        durationDisplay.textContent = "";
+      }
+    }
+
+    startsAtField.addEventListener('change', calculateDuration);
+    endsAtField.addEventListener('change', calculateDuration);
+    
+    // Initialize on load
+    calculateDuration();
+  });
+</script>

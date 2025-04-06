@@ -102,7 +102,7 @@ export default function AvailableSlotsScreen() {
   if (slots.length === 0) {
     return (
       <View style={styles.centered}>
-        <Feather name="calendar-x" size={48} color={Colors.textLight} />
+        <Feather name="calendar" size={48} color={Colors.textLight} />
         <Text style={styles.emptyText}>No available slots found</Text>
         <Text style={styles.emptySubText}>
           Pull down to refresh and check again
