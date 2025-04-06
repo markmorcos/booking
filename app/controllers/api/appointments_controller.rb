@@ -1,5 +1,11 @@
 module Api
   class AppointmentsController < Api::BaseController
+    # GET /api/appointments
+    def index
+      @appointments = Appointment.where(booking_email: params[:email])
+      render json: { data: @appointments }, status: :ok
+    end
+    
     # POST /api/appointments
     def create
       begin

@@ -10,30 +10,38 @@ import {
   Alert,
   Platform,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { getAvailableSlots, AvailabilitySlot } from "../../api/client";
-import SlotCard from "../../components/SlotCard";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getUserAppointments, Appointment } from "../../api/client";
+import AppointmentCard from "../../components/AppointmentCard";
 import { Colors, Spacing, FontSize } from "../../constants/theme";
 import { Feather } from "@expo/vector-icons";
 
-export default function AvailableSlotsScreen() {
-  const router = useRouter();
-  const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
+export default function AppointmentsScreen() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  const fetchSlots = useCallback(async (showRefresh = false) => {
+  const fetchAppointments = useCallback(async (showRefresh = false) => {
     try {
       if (!showRefresh) setLoading(true);
-      const data = await getAvailableSlots();
-      setSlots(data);
+      const email = await AsyncStorage.getItem("userEmail");
+      setUserEmail(email);
+
+      if (!email) {
+        setAppointments([]);
+        setLoading(false);
+        setRefreshing(false);
+        return;
+      }
+
+      const data = await getUserAppointments();
+      setAppointments(data);
       setError(null);
     } catch (err) {
-      console.error("Error in fetchSlots:", err);
-      setError(
-        "Failed to load available slots. Please check your network connection and try again."
-      );
+      console.error("Error in fetchAppointments:", err);
+      setError("Failed to load appointments. Please check your network connection and try again.");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -41,28 +49,21 @@ export default function AvailableSlotsScreen() {
   }, []);
 
   useEffect(() => {
-    fetchSlots();
-  }, [fetchSlots]);
+    fetchAppointments();
+  }, [fetchAppointments]);
 
   const handleRefresh = () => {
     setRefreshing(true);
-    fetchSlots(true);
+    fetchAppointments(true);
   };
 
   const handleRetry = () => {
     setError(null);
-    fetchSlots();
-  };
-
-  const handleSelectSlot = (slot: AvailabilitySlot) => {
-    router.push({
-      pathname: "/booking",
-      params: { slotId: slot.id },
-    });
+    fetchAppointments();
   };
 
   const showNetworkTroubleshooting = () => {
-    const platform = Platform.OS === "ios" ? "iOS" : "Android";
+    const platform = Platform.OS === 'ios' ? 'iOS' : 'Android';
     Alert.alert(
       "Network Troubleshooting",
       `Make sure that:\n\n1. Your ${platform} device is connected to the internet\n2. The backend server is running (Rails)\n3. Your device can reach the server\n\nIf using an emulator, make sure the server is running on the correct port (default: 3000).`,
@@ -74,7 +75,7 @@ export default function AvailableSlotsScreen() {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.loadingText}>Loading available slots...</Text>
+        <Text style={styles.loadingText}>Loading your appointments...</Text>
       </View>
     );
   }
@@ -88,10 +89,7 @@ export default function AvailableSlotsScreen() {
           <TouchableOpacity style={styles.button} onPress={handleRetry}>
             <Text style={styles.buttonText}>Try Again</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.helpButton]}
-            onPress={showNetworkTroubleshooting}
-          >
+          <TouchableOpacity style={[styles.button, styles.helpButton]} onPress={showNetworkTroubleshooting}>
             <Text style={styles.buttonText}>Help</Text>
           </TouchableOpacity>
         </View>
@@ -99,13 +97,25 @@ export default function AvailableSlotsScreen() {
     );
   }
 
-  if (slots.length === 0) {
+  if (!userEmail) {
+    return (
+      <View style={styles.centered}>
+        <Feather name="user-x" size={48} color={Colors.textLight} />
+        <Text style={styles.emptyText}>No appointments found</Text>
+        <Text style={styles.emptySubText}>
+          Book an appointment first to see your bookings
+        </Text>
+      </View>
+    );
+  }
+
+  if (appointments.length === 0) {
     return (
       <View style={styles.centered}>
         <Feather name="calendar-x" size={48} color={Colors.textLight} />
-        <Text style={styles.emptyText}>No available slots found</Text>
+        <Text style={styles.emptyText}>No appointments found</Text>
         <Text style={styles.emptySubText}>
-          Pull down to refresh and check again
+          You haven't booked any appointments yet
         </Text>
       </View>
     );
@@ -114,10 +124,8 @@ export default function AvailableSlotsScreen() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={slots}
-        renderItem={({ item }) => (
-          <SlotCard slot={item} onSelect={() => handleSelectSlot(item)} />
-        )}
+        data={appointments}
+        renderItem={({ item }) => <AppointmentCard appointment={item} />}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
         refreshControl={
@@ -161,7 +169,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   buttonContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginTop: Spacing.sm,
   },
   button: {
@@ -176,7 +184,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   emptyText: {
     marginTop: Spacing.md,

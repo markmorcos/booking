@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     resources :availability_slots, only: [ :index ]
-    resources :appointments, only: [ :create ]
+    resources :appointments, only: [ :index, :create ]
 
     namespace :admin do
       resources :availability_slots do
