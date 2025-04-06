@@ -1,11 +1,15 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+past_slot:
+  starts_at: <%= 1.day.ago.beginning_of_hour %>
+  ends_at: <%= 1.day.ago.beginning_of_hour + 1.hour %>
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-# column: value
+future_slot:
+  starts_at: <%= 1.day.from_now.beginning_of_hour %>
+  ends_at: <%= 1.day.from_now.beginning_of_hour + 1.hour %>
+
+booked_slot:
+  starts_at: <%= 2.days.from_now.beginning_of_hour %>
+  ends_at: <%= 2.days.from_now.beginning_of_hour + 1.hour %>
+
+available_slot:
+  starts_at: <%= 3.days.from_now.beginning_of_hour %>
+  ends_at: <%= 3.days.from_now.beginning_of_hour + 1.hour %>

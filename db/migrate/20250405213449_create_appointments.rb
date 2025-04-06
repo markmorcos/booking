@@ -5,7 +5,7 @@ class CreateAppointments < ActiveRecord::Migration[8.0]
       t.string :booking_name, null: false
       t.string :booking_email, null: false
       t.string :booking_phone
-      t.integer :status, null: false, default: 0
+      t.string :status, null: false
       t.timestamps
     end
   end

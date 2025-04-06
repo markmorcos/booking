@@ -7,7 +7,6 @@ module Api
       def index
         @availability_slots = AvailabilitySlot.all
 
-        # Filter by date range if provided
         if params[:start_date].present? && params[:end_date].present?
           start_date = Date.parse(params[:start_date]).beginning_of_day
           end_date = Date.parse(params[:end_date]).end_of_day
@@ -29,7 +28,7 @@ module Api
         if @availability_slot.save
           render json: { data: @availability_slot }, status: :created
         else
-          render json: { errors: @availability_slot.errors }, status: :unprocessable_entity
+          render json: { errors: @availability_slot.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -40,7 +39,6 @@ module Api
         end_date = Time.zone.parse(params[:end_date])
         duration_minutes = params[:duration_minutes].to_i
 
-        # Validate inputs
         if start_date.nil? || end_date.nil? || duration_minutes <= 0
           return render json: { errors: [ "Invalid parameters" ] }, status: :unprocessable_entity
         end
@@ -52,24 +50,19 @@ module Api
         while current_time + duration_minutes.minutes <= end_date
           slot_end = current_time + duration_minutes.minutes
 
-          # Check for overlap with existing slots
           if !slot_overlaps?(current_time, slot_end)
             slots << AvailabilitySlot.new(
               starts_at: current_time,
               ends_at: slot_end
             )
           end
-
-          # Move to next slot time
           current_time = slot_end
         end
 
-        # Save all slots in a transaction
         AvailabilitySlot.transaction do
           if slots.all?(&:save)
             render json: slots, status: :created
           else
-            # Collect all error messages
             error_messages = slots.map { |s| s.errors.full_messages if s.errors.any? }.compact
             raise ActiveRecord::Rollback
             render json: { errors: error_messages }, status: :unprocessable_entity
@@ -84,24 +77,19 @@ module Api
         end_date = Time.zone.parse(params[:end_date])
         new_duration_minutes = params[:duration_minutes].to_i
 
-        # Validate inputs
         if start_date.nil? || end_date.nil? || new_duration_minutes <= 0
           return render json: { errors: [ "Invalid parameters" ] }, status: :unprocessable_entity
         end
 
-        # Find slots in the date range
         slots = AvailabilitySlot.where("starts_at >= ? AND starts_at <= ?", start_date, end_date)
 
-        # Update slots duration
         updated_slots = []
         errors = []
 
         AvailabilitySlot.transaction do
           slots.each do |slot|
-            # Calculate new end time
             new_end_time = slot.starts_at + new_duration_minutes.minutes
 
-            # Skip slots with appointments
             next if slot.appointment.present?
 
             if slot.update(ends_at: new_end_time)
@@ -117,6 +105,15 @@ module Api
           else
             render json: { data: { slots: updated_slots } }
           end
+        end
+      end
+
+      # PATCH/PUT /api/admin/availability_slots/:id
+      def update
+        if @availability_slot.update(availability_slot_params)
+          render json: { data: @availability_slot }
+        else
+          render json: { errors: @availability_slot.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -136,16 +133,14 @@ module Api
         start_date = Time.zone.parse(params[:start_date])
         end_date = Time.zone.parse(params[:end_date])
 
-        # Validate inputs
         if start_date.nil? || end_date.nil?
           return render json: { errors: [ "Invalid date parameters" ] }, status: :unprocessable_entity
         end
 
-        # Find slots in the date range that don't have appointments
         slots_to_delete = AvailabilitySlot
-                            .left_joins(:appointment)
-                            .where("starts_at >= ? AND starts_at <= ?", start_date, end_date)
-                            .where(appointments: { id: nil })
+                          .left_joins(:appointment)
+                          .where("starts_at >= ? AND starts_at <= ?", start_date, end_date)
+                          .where(appointments: { id: nil })
 
         if slots_to_delete.destroy_all
           head :no_content

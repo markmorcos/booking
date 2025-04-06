@@ -1,22 +1,19 @@
 module Api
   module Admin
     class AppointmentsController < Api::Admin::BaseController
-      before_action :set_appointment, only: [ :show, :approve, :cancel, :reschedule, :complete, :mark_no_show ]
+      before_action :set_appointment, only: [ :show, :update, :destroy, :approve, :cancel, :reschedule, :complete, :mark_no_show ]
 
       # GET /api/admin/appointments
       def index
         @appointments = Appointment.all.includes(:availability_slot)
 
-        # Filter by status
         if params[:status].present?
           @appointments = @appointments.where(status: params[:status])
         end
 
-        # Filter by date range
         if params[:start_date].present? && params[:end_date].present?
           start_date = Date.parse(params[:start_date]).beginning_of_day
           end_date = Date.parse(params[:end_date]).end_of_day
-
           @appointments = @appointments.joins(:availability_slot)
                                       .where("availability_slots.starts_at >= ? AND availability_slots.starts_at <= ?",
                                             start_date, end_date)
@@ -30,6 +27,21 @@ module Api
         render json: { data: @appointment, include: :availability_slot }
       end
 
+      # PATCH/PUT /api/admin/appointments/:id
+      def update
+        if @appointment.update(appointment_params)
+          render json: { data: @appointment }
+        else
+          render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
+        end
+      end
+
+      # DELETE /api/admin/appointments/:id
+      def destroy
+        @appointment.destroy
+        head :no_content
+      end
+
       # PATCH /api/admin/appointments/:id/approve
       def approve
         if @appointment.status != "pending"
@@ -37,10 +49,11 @@ module Api
           return
         end
 
-        if @appointment.confirm!
+        if @appointment.update(status: :confirmed)
+          AppointmentMailer.confirmation_email(@appointment).deliver_later
           render json: { data: @appointment }
         else
-          render json: { errors: @appointment.errors }, status: :unprocessable_entity
+          render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -51,10 +64,11 @@ module Api
           return
         end
 
-        if @appointment.cancel!
+        if @appointment.update(status: :cancelled)
+          AppointmentMailer.cancellation_email(@appointment).deliver_later
           render json: { data: @appointment }
         else
-          render json: { errors: @appointment.errors }, status: :unprocessable_entity
+          render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -70,27 +84,21 @@ module Api
         begin
           new_slot = AvailabilitySlot.find(new_slot_id)
 
-          # Check if new slot is available
           if new_slot.appointment.present?
             render json: { errors: [ "Selected slot is already booked" ] }, status: :unprocessable_entity
             return
           end
 
-          # Perform rescheduling in a transaction
           Appointment.transaction do
-            # Cancel current appointment
-            @appointment.cancel!
+            @appointment.update(status: :cancelled)
 
-            # Create new appointment with same details but new slot
             @new_appointment = Appointment.create!(
               availability_slot: new_slot,
               booking_name: @appointment.booking_name,
               booking_email: @appointment.booking_email,
-              status: :confirmed # Directly confirm the rescheduled appointment
+              status: :confirmed
             )
 
-            # No need to call confirm! as it would send another email
-            # Instead manually send the confirmation email
             AppointmentMailer.confirmation_email(@new_appointment).deliver_later
           end
 
@@ -109,10 +117,11 @@ module Api
           return
         end
 
-        if @appointment.complete!
+        if @appointment.update(status: :completed)
+          AppointmentMailer.completion_email(@appointment).deliver_later
           render json: { data: @appointment }
         else
-          render json: { errors: @appointment.errors }, status: :unprocessable_entity
+          render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -123,10 +132,11 @@ module Api
           return
         end
 
-        if @appointment.no_show!
+        if @appointment.update(status: :no_show)
+          AppointmentMailer.no_show_email(@appointment).deliver_later
           render json: { data: @appointment }
         else
-          render json: { errors: @appointment.errors }, status: :unprocessable_entity
+          render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -134,6 +144,10 @@ module Api
 
       def set_appointment
         @appointment = Appointment.find(params[:id])
+      end
+
+      def appointment_params
+        params.require(:appointment).permit(:booking_name, :booking_email, :booking_phone)
       end
     end
   end

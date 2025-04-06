@@ -1,11 +1,29 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+pending_appointment:
+  booking_name: John Doe
+  booking_email: john@example.com
+  status: pending
+  availability_slot: booked_slot
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-# column: value
+confirmed_appointment:
+  booking_name: Jane Smith
+  booking_email: jane@example.com
+  status: confirmed
+  availability_slot: booked_slot
+
+cancelled_appointment:
+  booking_name: Bob Johnson
+  booking_email: bob@example.com
+  status: cancelled
+  availability_slot: booked_slot
+
+completed_appointment:
+  booking_name: Mary Brown
+  booking_email: mary@example.com
+  status: completed
+  availability_slot: booked_slot
+
+no_show_appointment:
+  booking_name: John Doe
+  booking_email: john@example.com
+  status: no_show
+  availability_slot: booked_slot

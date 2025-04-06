@@ -19,6 +19,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_05_213449) do
     t.string "booking_name", null: false
     t.string "booking_email", null: false
     t.string "booking_phone"
+    t.string "status", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["availability_slot_id"], name: "index_appointments_on_availability_slot_id"
