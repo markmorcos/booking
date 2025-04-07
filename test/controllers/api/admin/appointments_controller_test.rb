@@ -1,8 +1,14 @@
 require "test_helper"
 
 class Api::Admin::AppointmentsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    @admin = users(:admin)
+    # Set up authentication headers
+    @headers = auth_headers
+  end
+
   test "should get index" do
-    get api_admin_appointments_url, as: :json
+    get api_admin_appointments_url, headers: @headers, as: :json
     assert_response :success
 
     response_data = JSON.parse(@response.body)
@@ -18,7 +24,7 @@ class Api::Admin::AppointmentsControllerTest < ActionDispatch::IntegrationTest
 
   test "should get appointment by id" do
     appointment = appointments(:pending_appointment)
-    get api_admin_appointment_url(appointment), as: :json
+    get api_admin_appointment_url(appointment), headers: @headers, as: :json
     assert_response :success
 
     response_data = JSON.parse(@response.body)
@@ -33,11 +39,14 @@ class Api::Admin::AppointmentsControllerTest < ActionDispatch::IntegrationTest
   test "should update appointment" do
     appointment = appointments(:pending_appointment)
 
-    patch api_admin_appointment_url(appointment), params: {
-      appointment: {
-        booking_name: "Updated Name"
-      }
-    }, as: :json
+    patch api_admin_appointment_url(appointment),
+          params: {
+            appointment: {
+              booking_name: "Updated Name"
+            }
+          },
+          headers: @headers,
+          as: :json
 
     assert_response :success
 
@@ -48,7 +57,7 @@ class Api::Admin::AppointmentsControllerTest < ActionDispatch::IntegrationTest
   test "should confirm appointment" do
     appointment = appointments(:pending_appointment)
 
-    patch approve_api_admin_appointment_url(appointment), as: :json
+    patch approve_api_admin_appointment_url(appointment), headers: @headers, as: :json
     assert_response :success
 
     appointment.reload
@@ -58,7 +67,7 @@ class Api::Admin::AppointmentsControllerTest < ActionDispatch::IntegrationTest
   test "should cancel appointment" do
     appointment = appointments(:confirmed_appointment)
 
-    patch cancel_api_admin_appointment_url(appointment), as: :json
+    patch cancel_api_admin_appointment_url(appointment), headers: @headers, as: :json
     assert_response :success
 
     appointment.reload
@@ -68,7 +77,7 @@ class Api::Admin::AppointmentsControllerTest < ActionDispatch::IntegrationTest
   test "should complete appointment" do
     appointment = appointments(:confirmed_appointment)
 
-    patch complete_api_admin_appointment_url(appointment), as: :json
+    patch complete_api_admin_appointment_url(appointment), headers: @headers, as: :json
     assert_response :success
 
     appointment.reload
@@ -78,7 +87,7 @@ class Api::Admin::AppointmentsControllerTest < ActionDispatch::IntegrationTest
   test "should mark appointment as no_show" do
     appointment = appointments(:confirmed_appointment)
 
-    patch mark_no_show_api_admin_appointment_url(appointment), as: :json
+    patch mark_no_show_api_admin_appointment_url(appointment), headers: @headers, as: :json
     assert_response :success
 
     appointment.reload
@@ -89,7 +98,7 @@ class Api::Admin::AppointmentsControllerTest < ActionDispatch::IntegrationTest
     appointment = appointments(:pending_appointment)
 
     assert_difference("Appointment.count", -1) do
-      delete api_admin_appointment_url(appointment), as: :json
+      delete api_admin_appointment_url(appointment), headers: @headers, as: :json
     end
 
     assert_response :no_content

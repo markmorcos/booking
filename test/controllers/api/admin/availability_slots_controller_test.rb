@@ -1,8 +1,14 @@
 require "test_helper"
 
 class Api::Admin::AvailabilitySlotsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    @admin = users(:admin)
+    # Set up authentication headers
+    @headers = auth_headers
+  end
+
   test "should get index" do
-    get api_admin_availability_slots_url, as: :json
+    get api_admin_availability_slots_url, headers: @headers, as: :json
     assert_response :success
 
     response_data = JSON.parse(@response.body)
@@ -17,12 +23,15 @@ class Api::Admin::AvailabilitySlotsControllerTest < ActionDispatch::IntegrationT
 
   test "should create availability slot" do
     assert_difference("AvailabilitySlot.count") do
-      post api_admin_availability_slots_url, params: {
-        availability_slot: {
-          starts_at: 2.days.from_now.iso8601,
-          ends_at: 2.days.from_now.advance(hours: 1).iso8601
-        }
-      }, as: :json
+      post api_admin_availability_slots_url,
+           params: {
+             availability_slot: {
+               starts_at: 2.days.from_now.iso8601,
+               ends_at: 2.days.from_now.advance(hours: 1).iso8601
+             }
+           },
+           headers: @headers,
+           as: :json
     end
 
     assert_response :created
@@ -40,12 +49,15 @@ class Api::Admin::AvailabilitySlotsControllerTest < ActionDispatch::IntegrationT
     new_start = slot.starts_at + 30.minutes
     new_end = slot.ends_at + 30.minutes
 
-    patch api_admin_availability_slot_url(slot), params: {
-      availability_slot: {
-        starts_at: new_start.iso8601,
-        ends_at: new_end.iso8601
-      }
-    }, as: :json
+    patch api_admin_availability_slot_url(slot),
+          params: {
+            availability_slot: {
+              starts_at: new_start.iso8601,
+              ends_at: new_end.iso8601
+            }
+          },
+          headers: @headers,
+          as: :json
 
     assert_response :success
 
@@ -58,11 +70,14 @@ class Api::Admin::AvailabilitySlotsControllerTest < ActionDispatch::IntegrationT
     slot = availability_slots(:booked_slot)
     original_start = slot.starts_at
 
-    patch api_admin_availability_slot_url(slot), params: {
-      availability_slot: {
-        starts_at: (slot.starts_at + 1.hour).iso8601
-      }
-    }, as: :json
+    patch api_admin_availability_slot_url(slot),
+          params: {
+            availability_slot: {
+              starts_at: (slot.starts_at + 1.hour).iso8601
+            }
+          },
+          headers: @headers,
+          as: :json
 
     assert_response :unprocessable_entity
 
@@ -74,7 +89,7 @@ class Api::Admin::AvailabilitySlotsControllerTest < ActionDispatch::IntegrationT
     slot = availability_slots(:available_slot)
 
     assert_difference("AvailabilitySlot.count", -1) do
-      delete api_admin_availability_slot_url(slot), as: :json
+      delete api_admin_availability_slot_url(slot), headers: @headers, as: :json
     end
 
     assert_response :no_content
@@ -88,7 +103,7 @@ class Api::Admin::AvailabilitySlotsControllerTest < ActionDispatch::IntegrationT
     slot = availability_slots(:booked_slot)
 
     assert_no_difference("AvailabilitySlot.count") do
-      delete api_admin_availability_slot_url(slot), as: :json
+      delete api_admin_availability_slot_url(slot), headers: @headers, as: :json
     end
 
     assert_response :unprocessable_entity
