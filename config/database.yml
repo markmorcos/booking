@@ -84,9 +84,11 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: fr_youhanna_makin_production
-    username: fr_youhanna_makin
-    password: <%= ENV["FR_YOUHANNA_MAKIN_DATABASE_PASSWORD"] %>
+    database: <%= ENV["PGDATABASE"] %>
+    username: <%= ENV["PGUSER"] %>
+    password: <%= ENV["PGPASSWORD"] %>
+    host: <%= ENV["PGHOST"] %>
+    port: <%= ENV["PGPORT"] %>
   cache:
     <<: *primary_production
     database: fr_youhanna_makin_production_cache
