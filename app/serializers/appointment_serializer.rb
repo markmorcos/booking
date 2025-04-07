@@ -11,7 +11,7 @@ class AppointmentSerializer < ActiveModel::Serializer
       ends_at: object.availability_slot.ends_at,
       duration_minutes: object.availability_slot.duration_minutes,
       available: object.availability_slot.available?,
-      future: object.availability_slot.future?,
+      future: object.availability_slot.future?
   }
   end
 end

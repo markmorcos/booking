@@ -1,0 +1,96 @@
+<div class="py-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+    <h1 class="text-2xl font-semibold text-gray-900">Create Batch Availability Slots</h1>
+  </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+    <div class="py-4">
+      <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+          <h3 class="text-lg font-medium leading-6 text-gray-900">Batch Creation</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">
+            Create multiple availability slots in a single operation. Choose date range, time slots, and days of week.
+          </p>
+        </div>
+        
+        <%= form_with(url: create_batch_admin_availability_slots_path, method: :post, class: "divide-y divide-gray-200") do |form| %>
+          <div class="px-4 py-5 sm:px-6 space-y-6">
+            <!-- Date Range Selection -->
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <%= form.label :start_date, "Start Date", class: "block text-sm font-medium text-gray-700" %>
+                <%= form.date_field :start_date, required: true, min: Date.current.to_s, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+              </div>
+              <div>
+                <%= form.label :end_date, "End Date", class: "block text-sm font-medium text-gray-700" %>
+                <%= form.date_field :end_date, required: true, min: Date.current.to_s, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+              </div>
+            </div>
+            
+            <!-- Time Range Selection -->
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <%= form.label :start_time, "Start Time", class: "block text-sm font-medium text-gray-700" %>
+                <%= form.time_field :start_time, required: true, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+              </div>
+              <div>
+                <%= form.label :end_time, "End Time", class: "block text-sm font-medium text-gray-700" %>
+                <%= form.time_field :end_time, required: true, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+              </div>
+            </div>
+            
+            <!-- Appointment Duration -->
+            <div>
+              <%= form.label :duration, "Appointment Duration (minutes)", class: "block text-sm font-medium text-gray-700" %>
+              <%= form.number_field :duration, required: true, min: 5, value: 30, class: "mt-1 block w-60 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+            </div>
+            
+            <!-- Days of Week Selection -->
+            <div>
+              <%= form.label :weekdays, "Days of Week", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              
+              <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+                <% day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] %>
+                <% day_names.each_with_index do |day, index| %>
+                  <div class="flex items-center">
+                    <%= form.check_box "weekdays[]", { class: "h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" }, index.to_s, nil %>
+                    <%= form.label "weekdays_#{index}", day, class: "ml-2 block text-sm text-gray-700" %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Form Actions -->
+          <div class="px-4 py-4 sm:px-6 flex items-center justify-between bg-gray-50">
+            <div class="text-xs text-gray-500 italic">
+              <p>Slots will be created for all selected days between the start and end dates.</p>
+              <p>Each slot will have the specified duration.</p>
+            </div>
+            <div>
+              <%= form.submit "Create Batch", class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+              <%= link_to "Cancel", admin_availability_slots_path, class: "ml-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+            </div>
+          </div>
+        <% end %>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const startDateField = document.querySelector('#start_date');
+  const endDateField = document.querySelector('#end_date');
+  
+  if (startDateField && endDateField) {
+    startDateField.addEventListener('change', function() {
+      // Make sure end date is not before start date
+      if (endDateField.value && new Date(endDateField.value) < new Date(startDateField.value)) {
+        endDateField.value = startDateField.value;
+      }
+      endDateField.min = startDateField.value;
+    });
+  }
+});
+</script>

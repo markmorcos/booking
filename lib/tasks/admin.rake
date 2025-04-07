@@ -1,8 +1,8 @@
 namespace :admin do
   desc "Create an admin user"
   task create: :environment do
-    email = ENV['EMAIL']
-    password = ENV['PASSWORD']
+    email = ENV["EMAIL"]
+    password = ENV["PASSWORD"]
 
     if email.blank? || password.blank?
       puts "Usage: rake admin:create EMAIL=admin@example.com PASSWORD=password"
@@ -10,13 +10,13 @@ namespace :admin do
     end
 
     user = User.find_by(email: email)
-    
+
     if user
       user.update(admin: true)
       puts "User #{email} already exists and was given admin privileges"
     else
       user = User.new(email: email, password: password, password_confirmation: password, admin: true)
-      
+
       if user.save
         puts "Admin user #{email} created successfully"
       else
@@ -29,7 +29,7 @@ namespace :admin do
   desc "List all admin users"
   task list: :environment do
     admins = User.where(admin: true)
-    
+
     if admins.any?
       puts "Admin users:"
       admins.each do |admin|

@@ -6,7 +6,7 @@ module Api
       private
 
       def authorize_admin!
-        render json: { error: 'You are not authorized to access this area' }, status: :unauthorized unless current_user&.admin?
+        render json: { error: "You are not authorized to access this area" }, status: :unauthorized unless current_user&.admin?
       end
     end
   end

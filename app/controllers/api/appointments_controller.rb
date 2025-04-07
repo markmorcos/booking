@@ -9,7 +9,7 @@ module Api
 
       render json: @appointments, status: :ok
     end
-    
+
     # POST /api/appointments
     def create
       begin

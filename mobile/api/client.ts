@@ -12,7 +12,7 @@ const getApiUrl = () => {
 
   // get current ip
   if (__DEV__) {
-    return "http://192.168.1.20:3000/api";
+    return "http://192.168.68.167:3000/api";
   }
 
   return "http://localhost:3000/api";
