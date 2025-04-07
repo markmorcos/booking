@@ -1,32 +1,3 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
 en:
   date:
     formats:
@@ -46,35 +17,35 @@ en:
       date: "Date"
       time: "Time"
     pending_email:
-      subject: "Your Appointment Request"
-      title: "Your Appointment Request is Pending"
+      subject: "Your appointment request"
+      title: "Your appointment request is pending"
       greeting: "Dear %{name},"
       message: "I have received your appointment request and am currently reviewing it. I will respond to you as soon as possible."
       closing: "Thank you for reaching out. May God bless you."
     confirmation_email:
-      subject: "Your Appointment is Confirmed"
-      title: "Your Appointment is Confirmed"
+      subject: "Your appointment is confirmed"
+      title: "Your appointment is confirmed"
       greeting: "Dear %{name},"
       message: "I'm pleased to confirm your upcoming appointment with me."
       instructions: "Please arrive a few minutes early. If you need to reschedule or cancel, please do so at least 24 hours in advance."
       closing: "I look forward to our meeting. May God bless you."
     cancellation_email:
-      subject: "Your Appointment has been Cancelled"
-      title: "Your Appointment has been Cancelled"
+      subject: "Your Appointment has been cancelled"
+      title: "Your Appointment has been cancelled"
       greeting: "Dear %{name},"
       message: "This is to confirm that your appointment has been cancelled."
       instructions: "If you wish to reschedule, please request another appointment."
       closing: "Thank you for your understanding. May God be with you."
     completion_email:
-      subject: "Your Appointment has been Completed"
-      title: "Your Appointment has been Completed"
+      subject: "Your appointment has been completed"
+      title: "Your appointment has been completed"
       greeting: "Dear %{name},"
       message: "Thank you for visiting with me. Your appointment has been marked as completed."
       feedback: "I hope our meeting was helpful to you. If you have any questions or need further spiritual guidance, please don't hesitate to reach out."
       closing: "May God continue to bless and guide you."
     no_show_email:
-      subject: "Missed Appointment Notice"
-      title: "Missed Appointment Notice"
+      subject: "Missed appointment notice"
+      title: "Missed appointment notice"
       greeting: "Dear %{name},"
       message: "I noticed that you missed our scheduled appointment."
       instructions: "If you would like to reschedule, please book another appointment."
