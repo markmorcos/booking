@@ -1,0 +1,102 @@
+<%# filepath: /Users/markmorcos/Projects/fr-youhanna-makin/app/views/home/privacy.html.erb %>
+<% content_for :title, "Privacy Policy - Fr. Youhanna Makin" %>
+
+<div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+  <div class="px-6 py-8">
+    <div class="flex justify-between items-center border-b pb-4 mb-6">
+      <h1 class="text-3xl font-bold text-gray-900">Privacy Policy</h1>
+      <div class="text-sm text-gray-500">Last Updated: April 7, 2025</div>
+    </div>
+
+    <div class="prose prose-indigo max-w-none">
+      <p class="text-gray-700 mb-4">
+        This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make an appointment through <%= link_to "Fr. Youhanna Makin", root_path, class: "text-indigo-600 hover:text-indigo-800" %> (the "Site").
+      </p>
+
+      <h2 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Information We Collect</h2>
+      <p class="text-gray-700 mb-4">
+        When you schedule an appointment with us, we collect certain information from you, including:
+      </p>
+      <ul class="list-disc pl-6 mb-4 text-gray-700">
+        <li>Name</li>
+        <li>Email address</li>
+        <li>Phone number</li>
+        <li>Any additional information you provide related to your appointment</li>
+      </ul>
+
+      <h2 class="text-xl font-semibold text-gray-900 mt-6 mb-3">How We Use Your Information</h2>
+      <p class="text-gray-700 mb-4">
+        We use the information we collect to:
+      </p>
+      <ul class="list-disc pl-6 mb-4 text-gray-700">
+        <li>Schedule and manage your appointments</li>
+        <li>Communicate with you about your appointments, including sending confirmation and reminder emails</li>
+        <li>Improve our services and website</li>
+        <li>Comply with legal obligations</li>
+      </ul>
+
+      <h2 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Sharing Your Information</h2>
+      <p class="text-gray-700 mb-4">
+        We do not sell your personal information to third parties. We may share your information with service providers who help us operate our website and provide our services. These service providers have access to your personal information only to perform specific tasks on our behalf and are obligated not to disclose or use it for any other purpose.
+      </p>
+
+      <h2 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Data Retention</h2>
+      <p class="text-gray-700 mb-4">
+        We will maintain your appointment information for our records unless and until you ask us to delete this information.
+      </p>
+
+      <h2 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Your Rights</h2>
+      <p class="text-gray-700 mb-4">
+        If you are a resident of the European Economic Area (EEA), you have certain data protection rights. You have the right to access, update or delete the information we have on you. Whenever made possible, you can:
+      </p>
+      <ul class="list-disc pl-6 mb-4 text-gray-700">
+        <li>Access, update or delete your personal information</li>
+        <li>Object to our processing of your personal data</li>
+        <li>Request restriction of processing of your personal information</li>
+        <li>Request transfer of your personal information</li>
+        <li>Withdraw consent where we rely on consent to process your personal information</li>
+      </ul>
+
+      <h2 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Cookies</h2>
+      <p class="text-gray-700 mb-4">
+        Our site uses cookies to enhance your experience. Cookies are small files that a site or its service provider transfers to your computer's hard drive through your Web browser that enables the site to recognize your browser and capture and remember certain information.
+      </p>
+      <p class="text-gray-700 mb-4">
+        We use cookies to understand and save your preferences for future visits and compile aggregate data about site traffic and interactions so that we can offer better site experiences and tools in the future.
+      </p>
+
+      <h2 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Changes to This Privacy Policy</h2>
+      <p class="text-gray-700 mb-4">
+        We may update this privacy policy from time to time in order to reflect changes to our practices or for other operational, legal or regulatory reasons. We will post any changes on this page and encourage you to review our Privacy Policy frequently.
+      </p>
+
+      <h2 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Contact Us</h2>
+      <p class="text-gray-700 mb-4">
+        For more information about our privacy practices, if you have questions, or if you would like to make a complaint, please contact us by e-mail or by mail using the details provided below:
+      </p>
+      <div class="bg-gray-50 p-4 rounded-lg mb-6">
+        <p class="text-gray-700 mb-1">Fr Youhanna Makin</p>
+        <p class="text-gray-700 mb-1">19 B 1 Taqseem Ellaselky</p>
+        <p class="text-gray-700 mb-1">New Maadi - Cairo</p>
+        <p class="text-gray-700">Email: youhanna_makin@yahoo.com</p>
+      </div>
+
+      <div class="mt-8 border-t pt-6">
+        <p class="text-gray-600 text-sm">
+          By using our website, you hereby consent to our Privacy Policy and agree to its terms.
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="px-6 py-4 bg-gray-50 border-t">
+    <div class="flex justify-between items-center">
+      <div class="text-sm text-gray-600">
+        &copy; <%= Time.current.year %> Fr. Youhanna Makin. All rights reserved.
+      </div>
+      <div>
+        <%= link_to "Back to Home", root_path, class: "text-indigo-600 hover:text-indigo-800 text-sm font-medium" %>
+      </div>
+    </div>
+  </div>
+</div>

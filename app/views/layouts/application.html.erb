@@ -23,9 +23,11 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <body class="flex flex-col min-h-screen">
+    <main class="container mx-auto mt-28 px-5 flex-grow">
       <%= yield %>
     </main>
+    
+    <%= render "layouts/footer" %>
   </body>
 </html>

@@ -3,6 +3,9 @@ Rails.application.routes.draw do
 
   # Public root route
   root to: "home#index"
+  
+  # Legal pages
+  get "privacy", to: "home#privacy", as: :privacy_policy
 
   get "up" => "rails/health#show", as: :rails_health_check
 

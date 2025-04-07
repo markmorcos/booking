@@ -25,7 +25,6 @@ import { Feather } from "@expo/vector-icons";
 export default function BookingScreen() {
   const router = useRouter();
   const { slotId } = useLocalSearchParams();
-  console.log("Slot ID", slotId);
   const [slot, setSlot] = useState<AvailabilitySlot | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);

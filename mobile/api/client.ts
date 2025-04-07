@@ -12,10 +12,10 @@ const getApiUrl = () => {
 
   // get current ip
   if (__DEV__) {
-    return "http://192.168.68.167:3000/api";
+    return "http://0.0.0.0:3000/api";
   }
 
-  return "http://localhost:3000/api";
+  return "https://fr-youhanna-makin-production.up.railway.app/api";
 };
 
 const API_URL = getApiUrl();
