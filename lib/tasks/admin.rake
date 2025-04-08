@@ -10,6 +10,7 @@ namespace :admin do
     end
 
     user = User.find_by(email: email)
+    user.skip_confirmation!
 
     if user
       user.update(admin: true)

@@ -33,7 +33,7 @@ module Api
       @appointment.availability_slot = availability_slot
 
       if @appointment.save
-        AppointmentMailer.pending_email(@appointment).deliver_now
+        AppointmentMailer.pending_email(@appointment).deliver_later
         render json: @appointment, status: :created
       else
         render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
@@ -45,7 +45,7 @@ module Api
       @appointment = Appointment.find(params[:id])
 
       if @appointment.update(status: :cancelled)
-        AppointmentMailer.cancellation_email(@appointment).deliver_now
+        AppointmentMailer.cancellation_email(@appointment).deliver_later
         render json: @appointment, status: :ok
       else
         render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity

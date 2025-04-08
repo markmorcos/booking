@@ -1,10 +1,11 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users,
+             path: "admin",
+             path_names: { sign_in: "login", sign_out: "logout" },
+             only: [ :sessions ]
 
-  # Public root route
   root to: "home#index"
 
-  # Legal pages
   get "privacy", to: "home#privacy", as: :privacy_policy
 
   get "up" => "rails/health#show", as: :rails_health_check
