@@ -50,7 +50,7 @@ module Api
         end
 
         if @appointment.update(status: :confirmed)
-          AppointmentMailer.confirmation_email(@appointment).deliver_later
+          AppointmentMailer.confirmation_email(@appointment).deliver_now
           render json: { data: @appointment }
         else
           render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
@@ -65,7 +65,7 @@ module Api
         end
 
         if @appointment.update(status: :cancelled)
-          AppointmentMailer.cancellation_email(@appointment).deliver_later
+          AppointmentMailer.cancellation_email(@appointment).deliver_now
           render json: { data: @appointment }
         else
           render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
@@ -99,7 +99,7 @@ module Api
               status: :confirmed
             )
 
-            AppointmentMailer.confirmation_email(@new_appointment).deliver_later
+            AppointmentMailer.confirmation_email(@new_appointment).deliver_now
           end
 
           render json: { data: @new_appointment }
@@ -118,7 +118,7 @@ module Api
         end
 
         if @appointment.update(status: :completed)
-          AppointmentMailer.completion_email(@appointment).deliver_later
+          AppointmentMailer.completion_email(@appointment).deliver_now
           render json: { data: @appointment }
         else
           render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
@@ -133,7 +133,7 @@ module Api
         end
 
         if @appointment.update(status: :no_show)
-          AppointmentMailer.no_show_email(@appointment).deliver_later
+          AppointmentMailer.no_show_email(@appointment).deliver_now
           render json: { data: @appointment }
         else
           render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
