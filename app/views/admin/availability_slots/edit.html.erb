@@ -15,7 +15,7 @@
       <p class="mt-1 text-sm text-gray-500">
         Update the availability time slot start and end times.
       </p>
-      <% unless @availability_slot.available? %>
+      <% unless @availability_slot.available? || @availability_slot.appointment.nil? %>
         <div class="mt-4 p-4 rounded-md bg-yellow-50">
           <div class="flex">
             <div class="flex-shrink-0">

@@ -17,7 +17,7 @@ class AvailabilitySlot < ApplicationRecord
   end
 
   def future?
-    starts_at > Time.current
+    ends_at >= Time.current
   end
 
   def overlaps_with?(other_slot)

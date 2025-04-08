@@ -79,18 +79,21 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const startDateField = document.querySelector('#start_date');
-  const endDateField = document.querySelector('#end_date');
-  
-  if (startDateField && endDateField) {
-    startDateField.addEventListener('change', function() {
-      // Make sure end date is not before start date
-      if (endDateField.value && new Date(endDateField.value) < new Date(startDateField.value)) {
-        endDateField.value = startDateField.value;
-      }
-      endDateField.min = startDateField.value;
-    });
+  function initializeFormHandlers() {
+    const startDateField = document.querySelector('#start_date');
+    const endDateField = document.querySelector('#end_date');
+    
+    if (startDateField && endDateField) {
+      startDateField.addEventListener('change', function() {
+        // Make sure end date is not before start date
+        if (endDateField.value && new Date(endDateField.value) < new Date(startDateField.value)) {
+          endDateField.value = startDateField.value;
+        }
+        endDateField.min = startDateField.value;
+      });
+    }
   }
-});
+
+  document.addEventListener('DOMContentLoaded', initializeFormHandlers);
+  document.addEventListener('turbo:load', initializeFormHandlers);
 </script>

@@ -3,7 +3,7 @@ module Api
     # GET /api/availability_slots
     def index
       # Start with all future slots
-      @availability_slots = AvailabilitySlot.where("ends_at > ?", Time.current)
+      @availability_slots = AvailabilitySlot.where("ends_at >= ?", Time.current)
 
       if params[:month].present?
         # Parse month in YYYY-MM format and include all slots for that month
