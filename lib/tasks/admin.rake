@@ -10,13 +10,14 @@ namespace :admin do
     end
 
     user = User.find_by(email: email)
-    user.skip_confirmation!
 
     if user
+      user.skip_confirmation!
       user.update(admin: true)
       puts "User #{email} already exists and was given admin privileges"
     else
       user = User.new(email: email, password: password, password_confirmation: password, admin: true)
+      user.skip_confirmation!
 
       if user.save
         puts "Admin user #{email} created successfully"

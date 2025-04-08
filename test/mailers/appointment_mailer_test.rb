@@ -6,7 +6,7 @@ class AppointmentMailerTest < ActionMailer::TestCase
     email = AppointmentMailer.pending_email(appointment)
 
     assert_emails 1 do
-      email.deliver_later
+      email.deliver_now
     end
 
     assert_equal I18n.t("appointment_mailer.pending_email.subject"), email.subject
@@ -19,7 +19,7 @@ class AppointmentMailerTest < ActionMailer::TestCase
     email = AppointmentMailer.confirmation_email(appointment)
 
     assert_emails 1 do
-      email.deliver_later
+      email.deliver_now
     end
 
     assert_equal I18n.t("appointment_mailer.confirmation_email.subject"), email.subject
@@ -32,7 +32,7 @@ class AppointmentMailerTest < ActionMailer::TestCase
     email = AppointmentMailer.cancellation_email(appointment)
 
     assert_emails 1 do
-      email.deliver_later
+      email.deliver_now
     end
 
     assert_equal I18n.t("appointment_mailer.cancellation_email.subject"), email.subject
@@ -45,7 +45,7 @@ class AppointmentMailerTest < ActionMailer::TestCase
     email = AppointmentMailer.completion_email(appointment)
 
     assert_emails 1 do
-      email.deliver_later
+      email.deliver_now
     end
 
     assert_equal I18n.t("appointment_mailer.completion_email.subject"), email.subject
@@ -58,7 +58,7 @@ class AppointmentMailerTest < ActionMailer::TestCase
     email = AppointmentMailer.no_show_email(appointment)
 
     assert_emails 1 do
-      email.deliver_later
+      email.deliver_now
     end
 
     assert_equal I18n.t("appointment_mailer.no_show_email.subject"), email.subject
