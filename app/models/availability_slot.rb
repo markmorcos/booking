@@ -4,16 +4,16 @@ class AvailabilitySlot < ApplicationRecord
   validates :starts_at, :ends_at, presence: true
   validate :ends_at_after_starts_at
 
-  scope :available, -> { left_joins(:appointment).where(appointments: { id: nil }) }
+  scope :available, -> { left_joins(:appointment).where(appointments: { id: nil }).where("ends_at >= ?", Time.current) }
 
-  scope :future, -> { where("starts_at > ?", Time.current) }
+  scope :future, -> { where("ends_at >= ?", Time.current) }
 
   def duration_minutes
     ((ends_at - starts_at) / 60).to_i
   end
 
   def available?
-    appointment.nil?
+    appointment.nil? && ends_at >= Time.current
   end
 
   def future?

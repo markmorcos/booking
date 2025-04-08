@@ -12,7 +12,7 @@ const getApiUrl = () => {
 
   // get current ip
   if (__DEV__) {
-    return "http://0.0.0.0:3000/api";
+    return "http://192.168.1.32:3000/api";
   }
 
   return "https://fr-youhanna-makin-production.up.railway.app/api";
@@ -127,6 +127,42 @@ export const getAvailableSlots = async (): Promise<AvailabilitySlot[]> => {
   }
 };
 
+export const getAvailableSlotsForMonth = async (month: string): Promise<AvailabilitySlot[]> => {
+  try {
+    const response = await fetch(`${API_URL}/availability_slots?month=${month}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Server responded with ${response.status}: ${errorText}`);
+      throw new Error(
+        `Failed to fetch availability slots (${response.status})`
+      );
+    }
+
+    const { data } = await response.json();
+
+    const slots = data.map((slot: AvailabilitySlotPayload) => ({
+      id: slot.id,
+      startsAt: slot.attributes.startsAt,
+      endsAt: slot.attributes.endsAt,
+      available: slot.attributes.available,
+      durationMinutes: slot.attributes.durationMinutes,
+      future: slot.attributes.future,
+      appointment: slot.relationships.appointment.data,
+    }));
+
+    return slots;
+  } catch (error) {
+    console.error("Error fetching availability slots:", error);
+    throw error;
+  }
+};
+
 export const createAppointment = async (
   data: BookingFormData
 ): Promise<Appointment> => {
@@ -199,5 +235,34 @@ export const getUserAppointments = async (): Promise<Appointment[]> => {
     console.error("Error fetching user appointments:", error);
     // Return empty array instead of throwing to avoid crashes in the UI
     return [];
+  }
+};
+
+export const cancelAppointment = async (
+  appointmentId: number
+): Promise<Appointment> => {
+  try {
+    const response = await fetch(
+      `${API_URL}/appointments/${appointmentId}/cancel`,
+      {
+        method: "PATCH",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Server responded with ${response.status}: ${errorText}`);
+      throw new Error(`Failed to cancel appointment (${response.status})`);
+    }
+
+    const appointment = await response.json();
+    return appointment;
+  } catch (error) {
+    console.error("Error canceling appointment:", error);
+    throw error;
   }
 };

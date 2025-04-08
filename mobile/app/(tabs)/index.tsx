@@ -1,59 +1,97 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  StyleSheet,
-  FlatList,
-  View,
-  Text,
-  ActivityIndicator,
-  RefreshControl,
-  TouchableOpacity,
-  Alert,
-  Platform,
-} from "react-native";
+import { StyleSheet, View, FlatList, Platform, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
-import { getAvailableSlots, AvailabilitySlot } from "../../api/client";
-import SlotCard from "../../components/SlotCard";
-import { Colors, Spacing, FontSize } from "../../constants/theme";
-import { Feather } from "@expo/vector-icons";
+import {
+  getAvailableSlotsForMonth,
+  AvailabilitySlot,
+  getUserAppointments,
+} from "../../api/client";
+import { Spacing } from "../../constants/theme";
+import Calendar from "../../components/Calendar";
+import DaySlots from "../../components/DaySlots";
+import ScreenLayout from "../../components/layouts/ScreenLayout";
+import { format } from "date-fns";
 
-export default function AvailableSlotsScreen() {
+export default function HomeScreen() {
   const router = useRouter();
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [currentMonth, setCurrentMonth] = useState<string>(
+    format(new Date(), "yyyy-MM")
+  );
 
-  const fetchSlots = useCallback(async (showRefresh = false) => {
-    try {
-      if (!showRefresh) setLoading(true);
-      const data = await getAvailableSlots();
-      setSlots(data);
-      setError(null);
-    } catch (err) {
-      console.error("Error in fetchSlots:", err);
-      setError(
-        "Failed to load available slots. Please check your network connection and try again."
-      );
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
+  // Group slots by date
+  const slotsByDate = React.useMemo(() => {
+    const grouped: Record<string, AvailabilitySlot[]> = {};
 
+    slots.forEach((slot) => {
+      const dateKey = slot.startsAt.split("T")[0]; // YYYY-MM-DD format
+
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = [];
+      }
+
+      grouped[dateKey].push(slot);
+    });
+
+    return grouped;
+  }, [slots]);
+
+  // Fetch both slots and appointments
+  const fetchData = useCallback(
+    async (showRefresh = false) => {
+      try {
+        if (!showRefresh) setLoading(true);
+
+        // Fetch slots for the current month
+        const slotsData = await getAvailableSlotsForMonth(currentMonth);
+        setSlots(slotsData);
+
+        // Fetch user appointments
+        const appointmentsData = await getUserAppointments();
+        setAppointments(appointmentsData);
+
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError(
+          "Failed to load calendar data. Please check your network connection and try again."
+        );
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    },
+    [currentMonth]
+  );
+
+  // Initial data load
   useEffect(() => {
-    fetchSlots();
-  }, [fetchSlots]);
+    fetchData();
+  }, [fetchData]);
 
+  // Handle refresh
   const handleRefresh = () => {
     setRefreshing(true);
-    fetchSlots(true);
+    fetchData(true);
   };
 
-  const handleRetry = () => {
-    setError(null);
-    fetchSlots();
+  // Handle month change
+  const handleMonthChange = (month: string) => {
+    setCurrentMonth(month);
+    setSelectedDate(null);
   };
 
+  // Handle day selection
+  const handleDayPress = (date: string) => {
+    setSelectedDate((prevDate) => (prevDate === date ? null : date));
+  };
+
+  // Handle slot selection
   const handleSelectSlot = (slot: AvailabilitySlot) => {
     router.push({
       pathname: "/booking",
@@ -61,133 +99,45 @@ export default function AvailableSlotsScreen() {
     });
   };
 
-  const showNetworkTroubleshooting = () => {
-    const platform = Platform.OS === "ios" ? "iOS" : "Android";
-    Alert.alert(
-      "Network Troubleshooting",
-      `Make sure that:\n\n1. Your ${platform} device is connected to the internet\n2. The backend server is running (Rails)\n3. Your device can reach the server\n\nIf using an emulator, make sure the server is running on the correct port (default: 3000).`,
-      [{ text: "OK" }]
-    );
-  };
-
-  if (loading && !refreshing) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.loadingText}>Loading available slots...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Feather name="alert-circle" size={48} color={Colors.error} />
-        <Text style={styles.errorText}>{error}</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleRetry}>
-            <Text style={styles.buttonText}>Try Again</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.helpButton]}
-            onPress={showNetworkTroubleshooting}
-          >
-            <Text style={styles.buttonText}>Help</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  if (slots.length === 0) {
-    return (
-      <View style={styles.centered}>
-        <Feather name="calendar" size={48} color={Colors.textLight} />
-        <Text style={styles.emptyText}>No available slots found</Text>
-        <Text style={styles.emptySubText}>
-          Pull down to refresh and check again
-        </Text>
-      </View>
-    );
-  }
+  // Get slots for selected date
+  const selectedDateSlots = selectedDate ? slotsByDate[selectedDate] || [] : [];
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={slots}
-        renderItem={({ item }) => (
-          <SlotCard slot={item} onSelect={() => handleSelectSlot(item)} />
-        )}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            colors={[Colors.primary]}
-            tintColor={Colors.primary}
-          />
-        }
-      />
-    </View>
+    <ScreenLayout
+      error={error}
+      onRetry={() => fetchData()}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      scrollable={true}
+      emptyText="No available slots found"
+      emptySubText="Pull down to refresh and check again"
+      loadingText="Loading appointment calendar..."
+    >
+      <View style={styles.container}>
+        <Calendar
+          availableSlots={slots}
+          currentMonth={currentMonth}
+          onMonthChange={handleMonthChange}
+          onDayPress={handleDayPress}
+          selectedDate={selectedDate}
+          isLoading={loading || refreshing}
+        />
+
+        <DaySlots
+          date={selectedDate}
+          slots={selectedDateSlots}
+          onSelectSlot={handleSelectSlot}
+        />
+      </View>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  listContent: {
     padding: Spacing.md,
   },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: Colors.background,
-    padding: Spacing.lg,
-  },
-  loadingText: {
-    marginTop: Spacing.md,
-    color: Colors.text,
-    fontSize: FontSize.md,
-  },
-  errorText: {
-    marginTop: Spacing.md,
-    color: Colors.error,
-    fontSize: FontSize.md,
-    textAlign: "center",
-    marginBottom: Spacing.md,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    marginTop: Spacing.sm,
-  },
-  button: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderRadius: 8,
-    marginHorizontal: Spacing.xs,
-  },
-  helpButton: {
-    backgroundColor: Colors.textLight,
-  },
-  buttonText: {
-    color: Colors.white,
-    fontWeight: "600",
-  },
-  emptyText: {
-    marginTop: Spacing.md,
-    fontSize: FontSize.lg,
-    fontWeight: "600",
-    color: Colors.text,
-  },
-  emptySubText: {
-    marginTop: Spacing.xs,
-    fontSize: FontSize.md,
-    color: Colors.textLight,
-    textAlign: "center",
+  allDatesContainer: {
+    paddingBottom: Spacing.lg,
   },
 });

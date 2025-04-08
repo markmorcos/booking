@@ -73,6 +73,17 @@ export default function AppointmentsScreen() {
     );
   };
 
+  const handleAppointmentCancel = (appointmentId: number) => {
+    // Update the local state to mark the appointment as cancelled
+    setAppointments((currentAppointments) =>
+      currentAppointments.map((appointment) =>
+        appointment.id === appointmentId
+          ? { ...appointment, status: "cancelled" }
+          : appointment
+      )
+    );
+  };
+
   if (loading && !refreshing) {
     return (
       <View style={styles.centered}>
@@ -130,7 +141,12 @@ export default function AppointmentsScreen() {
     <View style={styles.container}>
       <FlatList
         data={appointments}
-        renderItem={({ item }) => <AppointmentCard appointment={item} />}
+        renderItem={({ item }) => (
+          <AppointmentCard
+            appointment={item}
+            onCancelSuccess={handleAppointmentCancel}
+          />
+        )}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
         refreshControl={

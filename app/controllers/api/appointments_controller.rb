@@ -40,6 +40,18 @@ module Api
       end
     end
 
+    # PATCH /api/appointments/:id/cancel
+    def cancel
+      @appointment = Appointment.find(params[:id])
+
+      if @appointment.update(status: :cancelled)
+        AppointmentMailer.cancellation_email(@appointment).deliver_now
+        render json: @appointment, status: :ok
+      else
+        render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
+      end
+    end
+
     private
 
     def appointment_params
