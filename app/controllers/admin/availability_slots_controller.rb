@@ -13,7 +13,7 @@ class Admin::AvailabilitySlotsController < Admin::BaseController
     end
 
     if params[:date].present?
-      date = Date.parse(params[:date])
+      date = Time.zone.parse(params[:date]).to_date
       @availability_slots = @availability_slots.where("DATE(starts_at) = ?", date)
     end
 
@@ -57,20 +57,20 @@ class Admin::AvailabilitySlotsController < Admin::BaseController
   end
 
   def create_batch
-    start_date = Date.parse(params[:start_date])
-    end_date = Date.parse(params[:end_date])
-    start_time = Time.parse(params[:start_time])
-    end_time = Time.parse(params[:end_time])
-    duration = params[:duration].to_i.minutes
-    weekdays = params[:weekdays] || []
+    start_date = Time.zone.parse(params[:start_date]).to_date
+    end_date   = Time.zone.parse(params[:end_date]).to_date
+    start_time = Time.zone.parse(params[:start_time])
+    end_time   = Time.zone.parse(params[:end_time])
+    duration   = params[:duration].to_i.minutes
+    weekdays   = params[:weekdays] || []
 
     created_count = 0
 
     (start_date..end_date).each do |date|
       next unless weekdays.include?(date.wday.to_s)
 
-      current_time = Time.new(date.year, date.month, date.day, start_time.hour, start_time.min)
-      end_of_day = Time.new(date.year, date.month, date.day, end_time.hour, end_time.min)
+      current_time = Time.zone.local(date.year, date.month, date.day, start_time.hour, start_time.min)
+      end_of_day   = Time.zone.local(date.year, date.month, date.day, end_time.hour, end_time.min)
 
       while current_time + duration <= end_of_day
         slot = AvailabilitySlot.new(
@@ -87,8 +87,8 @@ class Admin::AvailabilitySlotsController < Admin::BaseController
   end
 
   def delete_range
-    start_date = Date.parse(params[:start_date])
-    end_date = Date.parse(params[:end_date])
+    start_date = Time.zone.parse(params[:start_date]).to_date
+    end_date = Time.zone.parse(params[:end_date]).to_date
 
     slots = AvailabilitySlot.where("DATE(starts_at) >= ? AND DATE(starts_at) <= ?", start_date, end_date)
 
