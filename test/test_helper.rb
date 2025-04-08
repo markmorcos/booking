@@ -36,24 +36,9 @@ end
 class ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
 
-  # Setup for API admin controller tests
+  # Setup for API controller tests
   def setup
     @admin ||= users(:admin)
-
-    # Override auth methods for Admin API controllers
-    Api::Admin::BaseController.class_eval do
-      # Only return admin user when auth headers are present
-      def current_user
-        if request.headers["X-Admin-Auth"] == "true"
-          User.find_by(email: "admin@example.com")
-        else
-          nil
-        end
-      end
-
-      # Keep the original authorize_admin! method behavior
-      # It will check current_user, which we've modified above
-    end
   end
 end
 
