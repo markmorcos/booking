@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fr-youhanna-makin-deployment
+  namespace: fr-youhanna-makin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fr-youhanna-makin
+  template:
+    metadata:
+      labels:
+        app: fr-youhanna-makin
+    spec:
+      containers:
+        - name: fr-youhanna-makin
+          image: markmorcos/fr-youhanna-makin:latest
+          env:
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: fr-youhanna-makin-postgres-secret
+                  key: PGDATABASE
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: fr-youhanna-makin-postgres-secret
+                  key: PGUSER
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fr-youhanna-makin-postgres-secret
+                  key: PGPASSWORD
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: fr-youhanna-makin-postgres-secret
+                  key: PGHOST
+            - name: PGPORT
+              valueFrom:
+                secretKeyRef:
+                  name: fr-youhanna-makin-postgres-secret
+                  key: PGPORT
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fr-youhanna-makin-service
+  namespace: fr-youhanna-makin
+spec:
+  selector:
+    app: fr-youhanna-makin
+  ports:
+    - name: client
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
