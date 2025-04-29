@@ -31,7 +31,7 @@ jobs:
             .
 
       - name: Deploy to Raspberry Pi
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.2
         env:
           IMAGE_TAG: ${{ github.sha }}
         with:
