@@ -12,7 +12,5 @@ module FrYouhannaMakin
 
     config.time_zone = "Africa/Cairo"
     config.active_record.default_timezone = :local
-
-    config.relative_url_root = "/fr-youhanna-makin"
   end
 end
