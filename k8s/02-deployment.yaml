@@ -42,17 +42,3 @@ spec:
                 secretKeyRef:
                   name: fr-youhanna-makin-postgres-secret
                   key: PGPORT
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: fr-youhanna-makin-service
-  namespace: fr-youhanna-makin
-spec:
-  selector:
-    app: fr-youhanna-makin
-  ports:
-    - name: client
-      protocol: TCP
-      port: 3000
-      targetPort: 3000

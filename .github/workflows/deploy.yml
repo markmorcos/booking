@@ -30,19 +30,12 @@ jobs:
             -f Dockerfile \
             .
 
-      - name: Deploy to Raspberry Pi
-        uses: appleboy/ssh-action@v1.0.3
-        env:
-          IMAGE_TAG: ${{ github.sha }}
-        with:
-          host: ${{ secrets.RASPBERRY_PI_HOST }}
-          username: ${{ secrets.RASPBERRY_PI_USERNAME }}
-          key: ${{ secrets.RASPBERRY_PI_SSH_KEY }}
-          envs: IMAGE_TAG
-          script: |
-            set -e
-            export KUBECONFIG=$HOME/.kube/config
-            cd ~/Projects/fr-youhanna-makin
-            git pull
-            kubectl apply -f k8s/ --recursive
-            kubectl rollout restart deployment fr-youhanna-makin-deployment
+      - name: Stream and apply Kubernetes manifests on Pi
+        run: |
+          echo "${{ secrets.RASPBERRY_PI_SSH_KEY }}" > /tmp/id_rsa
+          chmod 600 /tmp/id_rsa
+          for file in $(find k8s -type f -name '*.yaml' | sort); do
+            echo "Applying $file..."
+            ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ secrets.RASPBERRY_PI_HOST }} \
+              "KUBECONFIG=\$HOME/.kube/config kubectl apply -f -" < "$file"
+          done
