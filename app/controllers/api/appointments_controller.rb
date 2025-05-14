@@ -1,3 +1,5 @@
+require_relative '../../services/whatsapp_service'
+
 module Api
   class AppointmentsController < Api::BaseController
     # GET /api/appointments
@@ -34,6 +36,7 @@ module Api
 
       if @appointment.save
         AppointmentMailer.pending_email(@appointment).deliver_now
+        ::WhatsappService.send_event_notification(@appointment, 'pending') if @appointment.booking_phone.present?
         render json: @appointment, status: :created
       else
         render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
@@ -46,6 +49,7 @@ module Api
 
       if @appointment.update(status: :cancelled)
         AppointmentMailer.cancellation_email(@appointment).deliver_now
+        ::WhatsappService.send_event_notification(@appointment, 'cancelled') if @appointment.booking_phone.present?
         render json: @appointment, status: :ok
       else
         render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity

@@ -4,17 +4,13 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
-  primary: &primary_development
+  primary:
     <<: *default
     database: fr_youhanna_makin_development
-    username: postgres
-    password: postgres
-    host: localhost
+    username: fr_youhanna_makin
+    password: passwordformakins
+    host: mark.onthewifi.com
     port: 5432
-  queue:
-    <<: *primary_development
-    database: fr_youhanna_makin_development_queue
-    migrations_paths: db/queue_migrate
 
 test:
   <<: *default

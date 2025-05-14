@@ -15,7 +15,7 @@ const getApiUrl = () => {
     return "http://192.168.1.32:3000/api";
   }
 
-  return "https://fr-youhanna-makin-production.up.railway.app/api";
+  return "https://mark.onthewifi.com/fr-youhanna-makin/api";
 };
 
 const API_URL = getApiUrl();
@@ -127,14 +127,19 @@ export const getAvailableSlots = async (): Promise<AvailabilitySlot[]> => {
   }
 };
 
-export const getAvailableSlotsForMonth = async (month: string): Promise<AvailabilitySlot[]> => {
+export const getAvailableSlotsForMonth = async (
+  month: string
+): Promise<AvailabilitySlot[]> => {
   try {
-    const response = await fetch(`${API_URL}/availability_slots?month=${month}`, {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${API_URL}/availability_slots?month=${month}`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
