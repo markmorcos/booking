@@ -1,10 +1,10 @@
-require 'httparty'
+require "httparty"
 
 class WhatsappService
   include HTTParty
 
-  BASE_URL = 'https://graph.facebook.com/v22.0'.freeze
-  TEMPLATE_NAME = 'event_notification'.freeze
+  BASE_URL = "https://graph.facebook.com/v22.0".freeze
+  TEMPLATE_NAME = "event_notification".freeze
 
   class << self
     def send_event_notification(appointment, type)
@@ -40,8 +40,8 @@ class WhatsappService
 
   def request_headers
     {
-      'Authorization' => "Bearer #{access_token}",
-      'Content-Type' => 'application/json'
+      "Authorization" => "Bearer #{access_token}",
+      "Content-Type" => "application/json"
     }
   end
 
@@ -51,30 +51,30 @@ class WhatsappService
       ar: "ar"
     }[I18n.locale.to_sym] || "en"
   end
-  
+
 
   def build_payload(appointment)
     {
-      messaging_product: 'whatsapp',
+      messaging_product: "whatsapp",
       to: format_phone_number(appointment.booking_phone),
-      type: 'template',
+      type: "template",
       template: {
         name: TEMPLATE_NAME,
         language: { code: whatsapp_language_code },
         components: [
           {
-            type: 'header',
+            type: "header",
             parameters: [
-              { type: 'text', parameter_name: 'event_type', text: format_translation('title') },
+              { type: "text", parameter_name: "event_type", text: format_translation("title") }
             ]
           },
           {
-            type: 'body',
+            type: "body",
             parameters: [
-              { type: 'text', parameter_name: 'booking_name', text: appointment.booking_name },
-              { type: 'text', parameter_name: 'message_content', text: format_translation('message') },
-              { type: 'text', parameter_name: 'event_date', text: format_date(appointment.availability_slot.starts_at) },
-              { type: 'text', parameter_name: 'event_time', text: format_time(appointment.availability_slot.starts_at, appointment.availability_slot.ends_at) }
+              { type: "text", parameter_name: "booking_name", text: appointment.booking_name },
+              { type: "text", parameter_name: "message_content", text: format_translation("message") },
+              { type: "text", parameter_name: "event_date", text: format_date(appointment.availability_slot.starts_at) },
+              { type: "text", parameter_name: "event_time", text: format_time(appointment.availability_slot.starts_at, appointment.availability_slot.ends_at) }
             ]
           }
         ]
@@ -84,21 +84,21 @@ class WhatsappService
 
   def format_phone_number(phone)
     return nil unless phone.present?
-    phone.gsub(/\D/, '')
+    phone.gsub(/\D/, "")
   end
 
   def format_translation(key)
     case @type
-    when 'pending'
-      I18n.t('appointment_mailer.pending_email.' + key.to_s, locale: I18n.locale)
-    when 'confirmed'
-      I18n.t('appointment_mailer.confirmation_email.' + key.to_s, locale: I18n.locale)
-    when 'cancelled'
-      I18n.t('appointment_mailer.cancellation_email.' + key.to_s, locale: I18n.locale)
-    when 'completed'
-      I18n.t('appointment_mailer.completion_email.' + key.to_s, locale: I18n.locale)
-    when 'no_show'
-      I18n.t('appointment_mailer.no_show_email.' + key.to_s, locale: I18n.locale)
+    when "pending"
+      I18n.t("appointment_mailer.pending_email." + key.to_s, locale: I18n.locale)
+    when "confirmed"
+      I18n.t("appointment_mailer.confirmation_email." + key.to_s, locale: I18n.locale)
+    when "cancelled"
+      I18n.t("appointment_mailer.cancellation_email." + key.to_s, locale: I18n.locale)
+    when "completed"
+      I18n.t("appointment_mailer.completion_email." + key.to_s, locale: I18n.locale)
+    when "no_show"
+      I18n.t("appointment_mailer.no_show_email." + key.to_s, locale: I18n.locale)
     end
   end
 
@@ -116,11 +116,11 @@ class WhatsappService
       true
     else
       error_message = begin
-        JSON.parse(response.body)['error']['message']
+        JSON.parse(response.body)["error"]["message"]
       rescue JSON::ParserError, NoMethodError
         response.body
       end
-      
+
       Rails.logger.error("WhatsApp API Error: #{response.code} - #{error_message}")
       Rails.logger.error("Request payload: #{response.request.options[:body]}")
       false
@@ -128,6 +128,6 @@ class WhatsappService
   end
 
   def access_token
-    ENV['WHATSAPP_ACCESS_TOKEN']
+    ENV["WHATSAPP_ACCESS_TOKEN"]
   end
 end

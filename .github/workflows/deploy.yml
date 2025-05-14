@@ -20,15 +20,18 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-          docker buildx create --use
-          docker buildx build \
-            --platform linux/arm64,linux/amd64 \
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker build \
             -t markmorcos/fr-youhanna-makin:$IMAGE_TAG \
             -t markmorcos/fr-youhanna-makin:latest \
-            --push \
+            --progress=plain \
+            --build-arg BUNDLE_FORCE_RUBY_PLATFORM=true \
+            --no-cache \
             -f Dockerfile \
             .
+
+          docker push markmorcos/fr-youhanna-makin:$IMAGE_TAG
+          docker push markmorcos/fr-youhanna-makin:latest
 
       - name: Stream and apply Kubernetes manifests on Pi
         run: |

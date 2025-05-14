@@ -23,7 +23,7 @@ gem "rack-cors"
 gem "devise"
 
 # CSS framework for rapid UI development
-gem "tailwindcss-rails"
+gem "tailwindcss-rails", "~> 2.7.9"
 
 # Pagination
 gem "kaminari"
