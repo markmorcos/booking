@@ -6,6 +6,7 @@ metadata:
 spec:
   template:
     spec:
+      restartPolicy: OnFailure
       containers:
         - name: migrate
           image: markmorcos/fr-youhanna-makin:latest
@@ -39,3 +40,7 @@ spec:
                   name: postgres-secrets
                   key: PGPORT
             - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: rails-secret
+                  key: SECRET_KEY_BASE
