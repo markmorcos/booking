@@ -9,11 +9,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger booking deployment
+      - name: Trigger infrastructure deployment
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.INFRASTRUCTURE_TOKEN }}
-          repository: markmorcos/booking
+          repository: markmorcos/infrastructure
           event-type: deploy-booking
           client-payload: |-
             {
