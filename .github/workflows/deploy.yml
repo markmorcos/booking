@@ -1,10 +1,9 @@
-name: deploy-infrastructure-admin
+name: deploy-booking
 
 on:
   workflow_dispatch: {}
   push:
     branches: [main]
-    paths: ["admin/**"]
 
 jobs:
   deploy:
