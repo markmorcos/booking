@@ -17,7 +17,7 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ secrets.RASPBERRY_PI_HOST }} \
             "KUBECONFIG=\$HOME/.kube/config && \
-            kubectl delete job/rails-db-migrate -n fr-youhanna-makin && \
+            kubectl delete job/rails-db-migrate -n booking && \
             kubectl apply -f - && \
-            kubectl wait --for=condition=complete job/rails-db-migrate -n fr-youhanna-makin --timeout=120s && \
-            kubectl logs job/rails-db-migrate -n fr-youhanna-makin" < k8s/04-migration.yaml
+            kubectl wait --for=condition=complete job/rails-db-migrate -n booking --timeout=120s && \
+            kubectl logs job/rails-db-migrate -n booking" < k8s/00-migration.yaml

@@ -2,14 +2,14 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: rails-db-migrate
-  namespace: fr-youhanna-makin
+  namespace: booking
 spec:
   template:
     spec:
       restartPolicy: OnFailure
       containers:
         - name: migrate
-          image: markmorcos/fr-youhanna-makin:latest
+          image: markmorcos/booking:latest
           command: ["bundle", "exec", "rails", "db:migrate"]
           env:
             - name: RAILS_ENV

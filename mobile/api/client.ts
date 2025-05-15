@@ -15,7 +15,7 @@ const getApiUrl = () => {
     return "http://192.168.1.32:3000/api";
   }
 
-  return "https://mark.onthewifi.com/fr-youhanna-makin/api";
+  return "https://booking.morcos.tech/api";
 };
 
 const API_URL = getApiUrl();

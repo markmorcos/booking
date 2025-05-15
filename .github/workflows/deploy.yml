@@ -1,58 +1,25 @@
-name: deploy
+name: deploy-infrastructure-admin
 
 on:
   workflow_dispatch: {}
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+    paths: ["admin/**"]
 
 jobs:
   deploy:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Build and push Docker image
-        env:
-          IMAGE_TAG: ${{ github.sha }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: |
-          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-          docker build \
-            -t markmorcos/fr-youhanna-makin:$IMAGE_TAG \
-            -t markmorcos/fr-youhanna-makin:latest \
-            --progress=plain \
-            --build-arg BUNDLE_FORCE_RUBY_PLATFORM=true \
-            --no-cache \
-            -f Dockerfile \
-            .
-
-          docker push markmorcos/fr-youhanna-makin:$IMAGE_TAG
-          docker push markmorcos/fr-youhanna-makin:latest
-
-      - name: Stream and apply Kubernetes manifests on Pi
-        run: |
-          echo "${{ secrets.RASPBERRY_PI_SSH_KEY }}" > /tmp/id_rsa
-          chmod 600 /tmp/id_rsa
-          for file in $(find k8s -type f -name '*.yaml' | sort); do
-            echo "Applying $file..."
-            ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ secrets.RASPBERRY_PI_HOST }} \
-              "KUBECONFIG=\$HOME/.kube/config kubectl apply -f -" < "$file"
-          done
-
-      - name: Run Rails DB migration job
-        env:
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          echo "${{ secrets.RASPBERRY_PI_SSH_KEY }}" > /tmp/id_rsa
-          chmod 600 /tmp/id_rsa
-
-          ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ secrets.RASPBERRY_PI_HOST }} \
-            "KUBECONFIG=\$HOME/.kube/config && \
-            kubectl delete job/rails-db-migrate -n fr-youhanna-makin && \
-            kubectl apply -f - && \
-            kubectl wait --for=condition=complete job/rails-db-migrate -n fr-youhanna-makin --timeout=120s && \
-            kubectl logs job/rails-db-migrate -n fr-youhanna-makin" < k8s/04-migration.yaml
+      - name: Trigger booking deployment
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.INFRASTRUCTURE_TOKEN }}
+          repository: markmorcos/booking
+          event-type: deploy-booking
+          client-payload: |-
+            {
+              "repository": "markmorcos/booking",
+              "token": "${{ secrets.DEPLOYMENT_TOKEN }}",
+              "version": "${{ github.sha }}",
+              "config_file": "deployment.yaml"
+            }
