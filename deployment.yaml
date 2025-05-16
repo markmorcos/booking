@@ -16,7 +16,7 @@ ingress:
       serviceName: booking-service
 
 deployments:
-  - name: booking
+  - name: booking-deployment
     image: markmorcos/booking
     env:
       - name: RAILS_ENV
