@@ -9,16 +9,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger infrastructure deployment
-        uses: peter-evans/repository-dispatch@v2
+      - name: Trigger and wait for infrastructure deployment
+        uses: convictional/trigger-workflow-and-wait@v1.6.0
         with:
-          token: ${{ secrets.INFRASTRUCTURE_TOKEN }}
-          repository: markmorcos/infrastructure
-          event-type: deploy-booking
-          client-payload: |-
+          owner: markmorcos
+          repo: infrastructure
+          github_token: ${{ secrets.INFRASTRUCTURE_TOKEN }}
+          workflow_file_name: deploy-app.yaml
+          client_payload: |
             {
               "repository": "markmorcos/booking",
               "token": "${{ secrets.DEPLOYMENT_TOKEN }}",
               "version": "${{ github.sha }}",
               "config_file": "deployment.yaml"
             }
+          propagate_failure: true
