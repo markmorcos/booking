@@ -10,7 +10,12 @@ spec:
       containers:
         - name: migrate
           image: markmorcos/booking:latest
-          command: ["bundle", "exec", "rails", "db:migrate"]
+          command:
+            [
+              "sh",
+              "-c",
+              "bundle exec rails db:create && bundle exec rails db:migrate",
+            ]
           env:
             - name: RAILS_ENV
               value: production
