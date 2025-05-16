@@ -21,7 +21,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.markmorcos.fryouhannamakin"
+      "package": "tech.morcos.booking"
     },
     "web": {
       "bundler": "metro",

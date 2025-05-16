@@ -22,7 +22,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Fr. Youhanna Makin",
+          title: "Booking",
           tabBarLabel: "Slots",
           tabBarIcon: ({ color }: any) => (
             <Feather name="calendar" size={24} color={color} />

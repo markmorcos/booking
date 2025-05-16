@@ -8,6 +8,6 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: fr_youhanna_makin_development
+      POSTGRES_DB: booking_development
     ports:
       - "5432:5432"

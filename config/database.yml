@@ -6,7 +6,7 @@ default: &default
 development:
   primary:
     <<: *default
-    database: fr_youhanna_makin_development
+    database: booking_development
     username: postgres
     password: postgres
     host: localhost
@@ -14,7 +14,7 @@ development:
 
 test:
   <<: *default
-  database: fr_youhanna_makin_test
+  database: booking_test
   username: postgres
   password: postgres
   host: localhost
@@ -30,12 +30,12 @@ production:
     port: <%= ENV["PGPORT"] %>
   cache:
     <<: *primary_production
-    database: fr_youhanna_makin_production_cache
+    database: booking_production_cache
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: fr_youhanna_makin_production_cable
+    database: booking_production_cable
     migrations_paths: db/cable_migrate

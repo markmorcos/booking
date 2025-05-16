@@ -11,7 +11,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
         />
 
-        <title>Fr. Youhanna Makin</title>
+        <title>Booking</title>
         <meta
           name="description"
           content="Book appointments quickly and easily"
