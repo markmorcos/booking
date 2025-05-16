@@ -1,8 +1,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rails-db-migrate
+  name: create-admin-user
   namespace: booking
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   template:
     spec:
@@ -10,12 +13,7 @@ spec:
       containers:
         - name: migrate
           image: markmorcos/booking:latest
-          command:
-            [
-              "sh",
-              "-c",
-              "bundle exec rails db:create && bundle exec rails db:migrate",
-            ]
+          command: ["rails", "db:create", "db:migrate", "db:seed"]
           env:
             - name: RAILS_ENV
               value: production
@@ -49,3 +47,8 @@ spec:
                 secretKeyRef:
                   name: rails-secret
                   key: SECRET_KEY_BASE
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: admin-secret
+                  key: ADMIN_PASSWORD
