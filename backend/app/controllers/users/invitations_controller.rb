@@ -17,4 +17,10 @@ class Users::InvitationsController < Devise::InvitationsController
   def after_accept_path_for(resource)
     admin_root_path
   end
+
+  private
+
+  def default_url_options
+    { tenant_path: current_tenant&.path }
+  end
 end
