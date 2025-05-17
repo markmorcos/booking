@@ -21,6 +21,7 @@ import {
 import { Colors, Spacing, FontSize, BorderRadius } from "../constants/theme";
 import { formatDateTime, formatSlotDuration } from "../utils/dateFormatter";
 import { Feather } from "@expo/vector-icons";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function BookingScreen() {
   const router = useRouter();
@@ -29,18 +30,7 @@ export default function BookingScreen() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const [formData, setFormData] = useState<BookingFormData>({
-    bookingName: "",
-    bookingEmail: "",
-    bookingPhone: "",
-    availabilitySlotId: Number(slotId),
-  });
-
-  const [formErrors, setFormErrors] = useState({
-    bookingName: "",
-    bookingEmail: "",
-  });
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchSlotDetails = async () => {
@@ -60,11 +50,6 @@ export default function BookingScreen() {
         }
 
         setSlot(selectedSlot);
-
-        const savedEmail = await AsyncStorage.getItem("userEmail");
-        if (savedEmail) {
-          setFormData((prev) => ({ ...prev, bookingEmail: savedEmail }));
-        }
       } catch (err) {
         setError("Failed to load slot details");
         console.error(err);
@@ -76,40 +61,18 @@ export default function BookingScreen() {
     fetchSlotDetails();
   }, [slotId]);
 
-  const validateForm = (): boolean => {
-    const errors = {
-      bookingName: "",
-      bookingEmail: "",
-    };
-
-    let isValid = true;
-
-    // Validate name
-    if (!formData.bookingName.trim()) {
-      errors.bookingName = "Name is required";
-      isValid = false;
-    }
-
-    // Validate email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.bookingEmail.trim()) {
-      errors.bookingEmail = "Email is required";
-      isValid = false;
-    } else if (!emailRegex.test(formData.bookingEmail)) {
-      errors.bookingEmail = "Please enter a valid email";
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-    return isValid;
-  };
-
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    if (!user) {
+      Alert.alert("Please login to book an appointment");
+      return;
+    }
 
     try {
       setSubmitting(true);
-      const result = await createAppointment(formData);
+      await createAppointment({
+        userId: user.id,
+        availabilitySlotId: Number(slotId),
+      });
 
       Alert.alert(
         "Booking Successful",
@@ -174,61 +137,6 @@ export default function BookingScreen() {
           <Text style={styles.duration}>
             Duration: {slot.durationMinutes} minutes
           </Text>
-        </View>
-
-        <View style={styles.formContainer}>
-          <Text style={styles.sectionTitle}>Your Information</Text>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Full Name *</Text>
-            <TextInput
-              style={[
-                styles.input,
-                formErrors.bookingName ? styles.inputError : null,
-              ]}
-              placeholder="Enter your full name"
-              value={formData.bookingName}
-              onChangeText={(text) =>
-                setFormData({ ...formData, bookingName: text })
-              }
-            />
-            {formErrors.bookingName ? (
-              <Text style={styles.errorMessage}>{formErrors.bookingName}</Text>
-            ) : null}
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email Address *</Text>
-            <TextInput
-              style={[
-                styles.input,
-                formErrors.bookingEmail ? styles.inputError : null,
-              ]}
-              placeholder="Enter your email address"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={formData.bookingEmail}
-              onChangeText={(text) =>
-                setFormData({ ...formData, bookingEmail: text })
-              }
-            />
-            {formErrors.bookingEmail ? (
-              <Text style={styles.errorMessage}>{formErrors.bookingEmail}</Text>
-            ) : null}
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Phone Number (Optional)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your phone number"
-              keyboardType="phone-pad"
-              value={formData.bookingPhone}
-              onChangeText={(text) =>
-                setFormData({ ...formData, bookingPhone: text })
-              }
-            />
-          </View>
         </View>
 
         <TouchableOpacity

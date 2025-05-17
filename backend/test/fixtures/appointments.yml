@@ -1,0 +1,24 @@
+pending_appointment:
+  user: user
+  status: pending
+  availability_slot: booked_slot
+
+confirmed_appointment:
+  user: user
+  status: confirmed
+  availability_slot: booked_slot
+
+cancelled_appointment:
+  user: user
+  status: cancelled
+  availability_slot: booked_slot
+
+completed_appointment:
+  user: user
+  status: completed
+  availability_slot: booked_slot
+
+no_show_appointment:
+  user: user
+  status: no_show
+  availability_slot: booked_slot

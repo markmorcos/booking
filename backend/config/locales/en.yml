@@ -1,0 +1,34 @@
+en:
+  date:
+    formats:
+      default: "%B %d, %Y"
+      short: "%b %d"
+      long: "%A, %B %d, %Y"
+  time:
+    formats:
+      default: "%I:%M %p"
+      short: "%H:%M"
+      long: "%I:%M:%S %p"
+      date_only: "%B %d, %Y"
+  appointment_mailer:
+    common:
+      signature: "In Christ,\nFr. Youhanna Makin"
+      details: "Appointment Details"
+      date: "Date"
+      time: "Time"
+      greeting: "Dear %{name},"
+    pending:
+      subject: "Your appointment request"
+      message: "I have received your appointment request and am currently reviewing it. I will respond to you as soon as possible."
+    confirmed:
+      subject: "Your appointment is confirmed"
+      message: "I'm pleased to confirm your upcoming appointment with me."
+    cancelled:
+      subject: "Your Appointment has been cancelled"
+      message: "This is to confirm that your appointment has been cancelled."
+    completed:
+      subject: "Your appointment has been completed"
+      message: "Thank you for visiting with me. Your appointment has been marked as completed."
+    no_show:
+      subject: "Missed appointment notice"
+      message: "I noticed that you missed our scheduled appointment."

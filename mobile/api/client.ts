@@ -28,9 +28,11 @@ export interface AvailabilitySlot {
   future: boolean;
   appointment: {
     id: number;
-    bookingName: string;
-    bookingEmail: string;
-    bookingPhone?: string;
+    user: {
+      name: string;
+      email: string;
+      phone?: string;
+    };
     status: "pending" | "confirmed" | "cancelled" | "completed" | "no_show";
   } | null;
 }
@@ -54,9 +56,12 @@ export interface AvailabilitySlotPayload {
 
 export interface Appointment {
   id: number;
-  bookingName: string;
-  bookingEmail: string;
-  bookingPhone?: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    phone?: string;
+  };
   status: "pending" | "confirmed" | "cancelled" | "completed" | "no_show";
   availabilitySlotId: number;
   availabilitySlot: AvailabilitySlot;
@@ -66,9 +71,12 @@ export interface AppointmentPayload {
   id: string;
   type: "appointments";
   attributes: {
-    bookingName: string;
-    bookingEmail: string;
-    bookingPhone?: string;
+    user: {
+      id: number;
+      name: string;
+      email: string;
+      phone?: string;
+    };
     status: "pending" | "confirmed" | "cancelled" | "completed" | "no_show";
     createdAt: string;
     updatedAt: string;
@@ -85,9 +93,7 @@ export interface AppointmentPayload {
 }
 
 export interface BookingFormData {
-  bookingName: string;
-  bookingEmail: string;
-  bookingPhone?: string;
+  userId: number;
   availabilitySlotId: number;
 }
 
@@ -179,9 +185,7 @@ export const createAppointment = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        booking_name: data.bookingName,
-        booking_email: data.bookingEmail,
-        booking_phone: data.bookingPhone,
+        user_id: data.userId,
         availability_slot_id: data.availabilitySlotId,
       }),
     });
@@ -194,8 +198,6 @@ export const createAppointment = async (
 
     const appointment = await response.json();
 
-    await AsyncStorage.setItem("userEmail", data.bookingEmail);
-
     return appointment;
   } catch (error) {
     console.error("Error creating appointment:", error);
@@ -205,18 +207,15 @@ export const createAppointment = async (
 
 export const getUserAppointments = async (): Promise<Appointment[]> => {
   try {
-    const userEmail = await AsyncStorage.getItem("userEmail");
-    if (!userEmail) return [];
+    const user = JSON.parse((await AsyncStorage.getItem("user")) as string);
+    if (!user) return [];
 
-    const response = await fetch(
-      `${API_URL}/appointments?email=${encodeURIComponent(userEmail)}`,
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${API_URL}/appointments?user_id=${user.id}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -224,13 +223,16 @@ export const getUserAppointments = async (): Promise<Appointment[]> => {
       throw new Error(`Failed to fetch appointments (${response.status})`);
     }
 
-    const { data, included } = await response.json();
+    const { data } = await response.json();
 
     const appointments = data.map((appointment: AppointmentPayload) => ({
       id: appointment.id,
-      bookingName: appointment.attributes.bookingName,
-      bookingEmail: appointment.attributes.bookingEmail,
-      bookingPhone: appointment.attributes.bookingPhone,
+      user: {
+        id: appointment.attributes.user.id,
+        name: appointment.attributes.user.name,
+        email: appointment.attributes.user.email,
+        phone: appointment.attributes.user.phone,
+      },
       status: appointment.attributes.status,
       availabilitySlot: appointment.attributes.availabilitySlot,
     }));
@@ -238,7 +240,6 @@ export const getUserAppointments = async (): Promise<Appointment[]> => {
     return appointments;
   } catch (error) {
     console.error("Error fetching user appointments:", error);
-    // Return empty array instead of throwing to avoid crashes in the UI
     return [];
   }
 };

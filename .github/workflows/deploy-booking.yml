@@ -20,5 +20,5 @@ jobs:
               "repository": "markmorcos/booking",
               "token": "${{ secrets.DEPLOYMENT_TOKEN }}",
               "version": "${{ github.sha }}",
-              "config_file": "deployment.yaml"
+              "config_file": "backend/deployment.yaml"
             }

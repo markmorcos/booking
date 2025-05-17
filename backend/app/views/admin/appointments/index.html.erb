@@ -1,0 +1,135 @@
+<div class="pb-5 border-b border-gray-200 sm:flex sm:items-center sm:justify-between">
+  <h1 class="text-2xl font-semibold text-gray-900">Appointments</h1>
+  <div class="mt-3 sm:mt-0 sm:ml-4">
+    <%= link_to new_admin_appointment_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+      <i class="fas fa-plus -ml-1 mr-2"></i>
+      New Appointment
+    <% end %>
+  </div>
+</div>
+
+<div class="mt-6 bg-white shadow overflow-hidden rounded-md">
+  <div class="px-4 py-5 sm:p-6">
+    <!-- Filter and Search -->
+    <div class="flex flex-col sm:flex-row sm:justify-between mb-6">
+      <div class="flex flex-col sm:flex-row">
+        <div class="mb-2 sm:mb-0 sm:mr-4">
+          <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
+          <%= form_tag admin_appointments_path, method: :get, class: "flex items-center" do %>
+            <%= hidden_field_tag :search, params[:search] %>
+            <%= select_tag :status, 
+                options_for_select([
+                  ['All', ''], 
+                  ['Pending', 'pending'], 
+                  ['Confirmed', 'confirmed'], 
+                  ['Cancelled', 'cancelled'], 
+                  ['Completed', 'completed'], 
+                  ['No-Show', 'no_show']
+                ], params[:status]), 
+                class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md",
+                onchange: "this.form.submit();" %>
+          <% end %>
+        </div>
+      </div>
+      <div>
+        <%= form_tag admin_appointments_path, method: :get, class: "flex items-end" do %>
+          <%= hidden_field_tag :status, params[:status] %>
+          <div class="flex rounded-md shadow-sm">
+            <%= text_field_tag :search, params[:search], placeholder: "Search by name...", class: "focus:ring-indigo-500 focus:border-indigo-500 flex-grow block w-full sm:text-sm border-gray-300 rounded-l-md" %>
+            <button type="submit" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 text-sm leading-4 font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Appointments Table -->
+    <% if @appointments.any? %>
+      <div class="flex flex-col">
+        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+            <div class="overflow-hidden border-b border-gray-200">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Booked By
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date & Time
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Duration
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th scope="col" class="relative px-6 py-3">
+                      <span class="sr-only">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <% @appointments.each do |appointment| %>
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                          <div>
+                            <div class="text-sm font-medium text-gray-900">
+                              <%= appointment.user.name %>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                              <%= appointment.user.email %>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900"><%= appointment.availability_slot.starts_at.strftime("%b %d, %Y") %></div>
+                        <div class="text-sm text-gray-500"><%= appointment.availability_slot.starts_at.strftime("%I:%M %p") %></div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900"><%= appointment.availability_slot.duration_minutes %> minutes</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                          <%= case appointment.status
+                            when 'pending' then 'bg-yellow-100 text-yellow-800'
+                            when 'confirmed' then 'bg-green-100 text-green-800'
+                            when 'cancelled' then 'bg-red-100 text-red-800'
+                            when 'completed' then 'bg-blue-100 text-blue-800'
+                            when 'no_show' then 'bg-gray-100 text-gray-800'
+                            end %>">
+                          <%= appointment.status.capitalize %>
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex justify-end space-x-3">
+                          <%= link_to admin_appointment_path(appointment), class: "text-indigo-600 hover:text-indigo-900" do %>
+                            <i class="fas fa-eye"></i>
+                          <% end %>
+                          <%= link_to edit_admin_appointment_path(appointment), class: "text-blue-600 hover:text-blue-900" do %>
+                            <i class="fas fa-edit"></i>
+                          <% end %>
+                          <%= button_to admin_appointment_path(appointment), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this appointment?" }, class: "text-red-600 hover:text-red-900 bg-transparent border-none p-0 cursor-pointer" do %>
+                            <i class="fas fa-trash"></i>
+                          <% end %>
+                        </div>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="text-center py-6 text-gray-500">
+        <i class="fas fa-calendar-times text-4xl mb-2"></i>
+        <p>No appointments found</p>
+      </div>
+    <% end %>
+  </div>
+</div>

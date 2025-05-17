@@ -65,7 +65,7 @@ export default function AppointmentCard({
     <View style={styles.container}>
       <View style={styles.header}>
         <StatusBadge status={appointment.status} />
-        <Text style={styles.name}>{appointment.bookingName}</Text>
+        <Text style={styles.name}>{appointment.user.name}</Text>
       </View>
 
       <View style={styles.detailsContainer}>
@@ -101,10 +101,10 @@ export default function AppointmentCard({
             color={Colors.primary}
             style={styles.icon}
           />
-          <Text style={styles.detailText}>{appointment.bookingEmail}</Text>
+          <Text style={styles.detailText}>{appointment.user.email}</Text>
         </View>
 
-        {appointment.bookingPhone && (
+        {appointment.user.phone && (
           <View style={styles.detailRow}>
             <Feather
               name="phone"
@@ -112,7 +112,7 @@ export default function AppointmentCard({
               color={Colors.primary}
               style={styles.icon}
             />
-            <Text style={styles.detailText}>{appointment.bookingPhone}</Text>
+            <Text style={styles.detailText}>{appointment.user.phone}</Text>
           </View>
         )}
 

@@ -10,6 +10,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
+import { AuthProvider } from "../contexts/AuthContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -50,13 +51,18 @@ function RootLayoutNav() {
     <>
       <StatusBar style="dark" />
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="booking"
-            options={{ presentation: "modal", headerTitle: "Book Appointment" }}
-          />
-        </Stack>
+        <AuthProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="booking"
+              options={{
+                presentation: "modal",
+                headerTitle: "Book Appointment",
+              }}
+            />
+          </Stack>
+        </AuthProvider>
       </ThemeProvider>
     </>
   );
