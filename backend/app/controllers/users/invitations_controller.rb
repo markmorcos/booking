@@ -1,6 +1,7 @@
 class Users::InvitationsController < Devise::InvitationsController
-  include ApplicationHelper
+  include TenantContext
 
+  before_action :set_current_tenant
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   protected

@@ -19,6 +19,7 @@ class Admin::UsersController < Admin::BaseController
 
   def create
     @user = current_tenant.users.users.new(user_params)
+    @user.skip_confirmation!
 
     if @user.save
       @user.invite!
