@@ -51,6 +51,31 @@ deployments:
           secretKeyRef:
             name: rails-secret
             key: SECRET_KEY_BASE
+      - name: SMTP_ADDRESS
+        valueFrom:
+          secretKeyRef:
+            name: smtp-secrets
+            key: SMTP_ADDRESS
+      - name: SMTP_DOMAIN
+        valueFrom:
+          secretKeyRef:
+            name: smtp-secrets
+            key: SMTP_DOMAIN
+      - name: SMTP_PORT
+        valueFrom:
+          secretKeyRef:
+            name: smtp-secrets
+            key: SMTP_PORT
+      - name: SMTP_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: smtp-secrets
+            key: SMTP_USERNAME
+      - name: SMTP_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: smtp-secrets
+            key: SMTP_PASSWORD
 
 services:
   - name: booking-service

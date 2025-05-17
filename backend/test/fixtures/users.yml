@@ -1,13 +1,38 @@
 # Admin user
 admin:
+  tenant: one
+  name: Admin User
   email: admin@example.com
   encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
   role: admin
-  name: Admin User
 
 # Regular user
 user:
+  tenant: one
   email: user@example.com
   encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
   role: user
   name: Regular User
+
+one:
+  name: Admin User
+  email: admin@first.com
+  phone: "1234567890"
+  tenant: one
+  invitation_accepted_at: <%= Time.current %>
+  invitation_sent_at: <%= 1.day.ago %>
+
+two:
+  name: Regular User
+  email: user@second.com
+  phone: "0987654321"
+  tenant: two
+  invitation_accepted_at: <%= Time.current %>
+  invitation_sent_at: <%= 1.day.ago %>
+
+pending_invitation:
+  name: Pending User
+  email: pending@first.com
+  phone: "5555555555"
+  tenant: one
+  invitation_sent_at: <%= 1.day.ago %>

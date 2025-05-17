@@ -1,9 +1,10 @@
 class HomeController < ApplicationController
   def index
-    redirect_to admin_root_path if current_user&.admin?
+    if current_user&.admin?
+      redirect_to admin_root_path
+    end
   end
 
   def privacy
-    # The privacy policy page doesn't require any special logic
   end
 end

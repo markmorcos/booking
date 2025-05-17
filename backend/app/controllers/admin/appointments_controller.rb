@@ -1,130 +1,110 @@
 require_relative "../../services/whatsapp_service"
 
 class Admin::AppointmentsController < Admin::BaseController
-  before_action :set_appointment, except: [ :index, :new, :create ]
+  include AppointmentStatusHandler
 
-  STATUS_MAPPER = {
-    pending: Proc.new { |appointment|
-      AppointmentMailer.status_email(appointment).deliver_now
-      ::WhatsappService.send_event_notification(appointment, "pending") if appointment.booking_phone.present?
-    },
-    confirmed: Proc.new { |appointment|
-      AppointmentMailer.status_email(appointment).deliver_now
-      ::WhatsappService.send_event_notification(appointment, "confirmed") if appointment.booking_phone.present?
-    },
-    cancelled: Proc.new { |appointment|
-      AppointmentMailer.status_email(appointment).deliver_now
-      ::WhatsappService.send_event_notification(appointment, "cancelled") if appointment.booking_phone.present?
-    },
-    completed: Proc.new { |appointment|
-      AppointmentMailer.status_email(appointment).deliver_now
-      ::WhatsappService.send_event_notification(appointment, "completed") if appointment.booking_phone.present?
-    },
-    no_show: Proc.new { |appointment|
-      AppointmentMailer.status_email(appointment).deliver_now
-      ::WhatsappService.send_event_notification(appointment, "no_show") if appointment.booking_phone.present?
-    }
-  }.freeze
+  before_action :set_appointment, only: [ :show, :edit, :update, :destroy, :confirm, :cancel, :reschedule, :complete, :mark_no_show ]
 
   def index
-    @appointments = Appointment.joins(:availability_slot)
-                              .order("availability_slots.starts_at DESC")
-                              .page(params[:page]).per(10)
-
-    @appointments = @appointments.where(status: params[:status]) if params[:status].present?
-    @appointments = @appointments.includes(:user).where("users.name ILIKE ?", "%#{params[:search]}%") if params[:search].present?
+    @appointments = current_tenant.appointments.includes(:user, :availability_slot)
   end
 
   def show
   end
 
   def new
-    @appointment = Appointment.new
-    @available_slots = AvailabilitySlot.future.available.order(starts_at: :asc)
+    @appointment = current_tenant.appointments.new
+    @appointment.availability_slot_id = params[:availability_slot_id] if params[:availability_slot_id].present?
+    @available_slots = current_tenant.availability_slots
+                                   .future
+                                   .order(starts_at: :asc)
+  end
+
+  def edit
+    @available_slots = current_tenant.availability_slots
+                                   .future
+                                   .order(starts_at: :asc)
   end
 
   def create
-    @appointment = Appointment.new(appointment_params)
+    @appointment = current_tenant.appointments.new(appointment_params)
 
     if @appointment.save
-      AppointmentMailer.status_email(@appointment).deliver_now
-      ::WhatsappService.send_event_notification(@appointment, "pending") if @appointment.booking_phone.present?
       redirect_to admin_appointment_path(@appointment), notice: "Appointment was successfully created."
     else
-      @available_slots = AvailabilitySlot.future.available.order(starts_at: :asc)
+      @available_slots = current_tenant.availability_slots
+                                     .future
+                                     .order(starts_at: :asc)
       render :new, status: :unprocessable_entity
     end
   end
 
-  def edit
-    @available_slots = AvailabilitySlot.future.order(starts_at: :asc)
-  end
-
   def update
-    previous_status = @appointment.status
     if @appointment.update(appointment_params)
-      STATUS_MAPPER[@appointment.status.to_sym].call(@appointment) if appointment_params[:status] != previous_status
       redirect_to admin_appointment_path(@appointment), notice: "Appointment was successfully updated."
     else
-      @available_slots = AvailabilitySlot.future.order(starts_at: :asc)
+      @available_slots = current_tenant.availability_slots
+                                     .future
+                                     .order(starts_at: :asc)
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
     @appointment.destroy
-    AppointmentMailer.status_email(@appointment).deliver_now
-    ::WhatsappService.send_event_notification(@appointment, "cancelled") if @appointment.booking_phone.present?
-    redirect_to admin_appointments_path, notice: "Appointment was successfully deleted."
+    redirect_to admin_appointments_path, notice: "Appointment was successfully destroyed."
   end
 
   def confirm
-    @appointment.update(status: :confirmed)
-    AppointmentMailer.status_email(@appointment).deliver_now
-    ::WhatsappService.send_event_notification(@appointment, "confirmed") if @appointment.booking_phone.present?
-    redirect_to admin_appointment_path(@appointment), notice: "Appointment was confirmed."
+    if handle_status_change(@appointment, :confirmed)
+      redirect_to admin_appointment_path(@appointment), notice: "Appointment was confirmed."
+    else
+      redirect_to admin_appointment_path(@appointment), alert: "Failed to confirm appointment."
+    end
   end
 
   def cancel
-    @appointment.update(status: :cancelled)
-    AppointmentMailer.status_email(@appointment).deliver_now
-    ::WhatsappService.send_event_notification(@appointment, "cancelled") if @appointment.booking_phone.present?
-    redirect_to admin_appointment_path(@appointment), notice: "Appointment was cancelled."
+    if handle_status_change(@appointment, :cancelled)
+      redirect_to admin_appointment_path(@appointment), notice: "Appointment was cancelled."
+    else
+      redirect_to admin_appointment_path(@appointment), alert: "Failed to cancel appointment."
+    end
   end
 
   def reschedule
-    if params[:availability_slot_id].present?
-      new_slot = AvailabilitySlot.find(params[:availability_slot_id])
-      @appointment.update(availability_slot: new_slot)
-      AppointmentMailer.status_email(@appointment).deliver_now
-      ::WhatsappService.send_event_notification(@appointment, "confirmed") if @appointment.booking_phone.present?
+    if @appointment.update(appointment_params)
       redirect_to admin_appointment_path(@appointment), notice: "Appointment was rescheduled."
     else
-      redirect_to edit_admin_appointment_path(@appointment), alert: "Please select a new time slot."
+      @available_slots = current_tenant.availability_slots
+                                     .future
+                                     .order(starts_at: :asc)
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def complete
-    @appointment.update(status: :completed)
-    AppointmentMailer.status_email(@appointment).deliver_now
-    ::WhatsappService.send_event_notification(@appointment, "completed") if @appointment.booking_phone.present?
-    redirect_to admin_appointment_path(@appointment), notice: "Appointment was marked as completed."
+    if handle_status_change(@appointment, :completed)
+      redirect_to admin_appointment_path(@appointment), notice: "Appointment was marked as completed."
+    else
+      redirect_to admin_appointment_path(@appointment), alert: "Failed to mark appointment as completed."
+    end
   end
 
   def mark_no_show
-    @appointment.update(status: :no_show)
-    AppointmentMailer.status_email(@appointment).deliver_now
-    ::WhatsappService.send_event_notification(@appointment, "no_show") if @appointment.booking_phone.present?
-    redirect_to admin_appointment_path(@appointment), notice: "Appointment was marked as no-show."
+    if handle_status_change(@appointment, :no_show)
+      redirect_to admin_appointment_path(@appointment), notice: "Appointment was marked as no show."
+    else
+      redirect_to admin_appointment_path(@appointment), alert: "Failed to mark appointment as no show."
+    end
   end
 
   private
 
   def set_appointment
-    @appointment = Appointment.find(params[:id])
+    @appointment = current_tenant.appointments.find(params[:id])
   end
 
   def appointment_params
-    params.require(:appointment).permit(:availability_slot_id, :user_id, :status)
+    params.require(:appointment).permit(:user_id, :availability_slot_id, :status)
   end
 end

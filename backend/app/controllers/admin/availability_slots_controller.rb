@@ -2,7 +2,7 @@ class Admin::AvailabilitySlotsController < Admin::BaseController
   before_action :set_availability_slot, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @availability_slots = AvailabilitySlot.order(:starts_at)
+    @availability_slots = current_tenant.availability_slots.order(:starts_at)
 
     if params[:filter] == "available"
       @availability_slots = @availability_slots.available
@@ -24,20 +24,20 @@ class Admin::AvailabilitySlotsController < Admin::BaseController
   end
 
   def new
-    @availability_slot = AvailabilitySlot.new
+    @availability_slot = current_tenant.availability_slots.new
+  end
+
+  def edit
   end
 
   def create
-    @availability_slot = AvailabilitySlot.new(availability_slot_params)
+    @availability_slot = current_tenant.availability_slots.new(availability_slot_params)
 
     if @availability_slot.save
       redirect_to admin_availability_slot_path(@availability_slot), notice: "Availability slot was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
-  end
-
-  def edit
   end
 
   def update
@@ -50,10 +50,11 @@ class Admin::AvailabilitySlotsController < Admin::BaseController
 
   def destroy
     @availability_slot.destroy
-    redirect_to admin_availability_slots_path, notice: "Availability slot was successfully deleted."
+    redirect_to admin_availability_slots_path, notice: "Availability slot was successfully destroyed."
   end
 
   def new_batch
+    @availability_slot = current_tenant.availability_slots.new
   end
 
   def create_batch
@@ -73,7 +74,7 @@ class Admin::AvailabilitySlotsController < Admin::BaseController
       end_of_day   = Time.zone.local(date.year, date.month, date.day, end_time.hour, end_time.min)
 
       while current_time + duration <= end_of_day
-        slot = AvailabilitySlot.new(
+        slot = current_tenant.availability_slots.new(
           starts_at: current_time,
           ends_at: current_time + duration
         )
@@ -83,29 +84,43 @@ class Admin::AvailabilitySlotsController < Admin::BaseController
       end
     end
 
-    redirect_to admin_availability_slots_path, notice: "Successfully created #{created_count} availability slots."
+    redirect_to admin_availability_slots_path, notice: "#{created_count} availability slots were successfully created."
+  end
+
+  def update_durations
+    if params[:duration].blank?
+      redirect_to admin_availability_slots_path, alert: "Duration is required."
+      return
+    end
+
+    current_tenant.availability_slots.update_all(duration: params[:duration])
+    redirect_to admin_availability_slots_path, notice: "All availability slots were updated with the new duration."
   end
 
   def delete_range
-    start_date = Time.zone.parse(params[:start_date]).to_date
-    end_date = Time.zone.parse(params[:end_date]).to_date
+    if params[:start_date].blank? || params[:end_date].blank?
+      redirect_to admin_availability_slots_path, alert: "Start date and end date are required."
+      return
+    end
 
-    slots = AvailabilitySlot.where("DATE(starts_at) >= ? AND DATE(starts_at) <= ?", start_date, end_date)
+    start_date = Date.parse(params[:start_date])
+    end_date = Date.parse(params[:end_date])
 
-    available_slots = slots.available
-    deleted_count = available_slots.count
-    available_slots.destroy_all
+    deleted_count = current_tenant.availability_slots
+                                .where("DATE(starts_at) BETWEEN ? AND ?", start_date, end_date)
+                                .destroy_all
+                                .count
 
-    redirect_to admin_availability_slots_path, notice: "Successfully deleted #{deleted_count} availability slots."
+    redirect_to admin_availability_slots_path, notice: "#{deleted_count} availability slots were successfully deleted."
   end
 
   private
 
   def set_availability_slot
-    @availability_slot = AvailabilitySlot.find(params[:id])
+    @availability_slot = current_tenant.availability_slots.find(params[:id])
   end
 
   def availability_slot_params
-    params.require(:availability_slot).permit(:starts_at, :ends_at)
+    params.require(:availability_slot).permit(:starts_at, :ends_at, :duration)
   end
 end

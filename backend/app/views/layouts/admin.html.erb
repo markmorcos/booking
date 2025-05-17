@@ -26,15 +26,20 @@
               <i class="fas fa-home mr-3"></i>
               Dashboard
             <% end %>
-            
-            <%= link_to admin_appointments_path, class: "text-white hover:bg-indigo-600 group flex items-center px-2 py-2 text-base font-medium rounded-md #{controller_name == 'appointments' ? 'bg-indigo-700' : ''}" do %>
-              <i class="fas fa-calendar-check mr-3"></i>
-              Appointments
+
+            <%= link_to admin_users_path, class: "text-white hover:bg-indigo-600 group flex items-center px-2 py-2 text-base font-medium rounded-md #{controller_name == 'users' ? 'bg-indigo-700' : ''}" do %>
+              <i class="fas fa-users mr-3"></i>
+              Users
             <% end %>
-            
+
             <%= link_to admin_availability_slots_path, class: "text-white hover:bg-indigo-600 group flex items-center px-2 py-2 text-base font-medium rounded-md #{controller_name == 'availability_slots' ? 'bg-indigo-700' : ''}" do %>
               <i class="fas fa-calendar-alt mr-3"></i>
               Availability Slots
+            <% end %>
+
+            <%= link_to admin_appointments_path, class: "text-white hover:bg-indigo-600 group flex items-center px-2 py-2 text-base font-medium rounded-md #{controller_name == 'appointments' ? 'bg-indigo-700' : ''}" do %>
+              <i class="fas fa-calendar-check mr-3"></i>
+              Appointments
             <% end %>
           </nav>
         </div>
@@ -69,6 +74,7 @@
         <%= link_to "Dashboard", admin_root_path, class: "text-white hover:bg-indigo-600 block px-3 py-2 rounded-md text-base font-medium" %>
         <%= link_to "Appointments", admin_appointments_path, class: "text-white hover:bg-indigo-600 block px-3 py-2 rounded-md text-base font-medium" %>
         <%= link_to "Availability Slots", admin_availability_slots_path, class: "text-white hover:bg-indigo-600 block px-3 py-2 rounded-md text-base font-medium" %>
+        <%= link_to "Users", admin_users_path, class: "text-white hover:bg-indigo-600 block px-3 py-2 rounded-md text-base font-medium" %>
       </div>
     </div>
 

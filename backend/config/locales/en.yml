@@ -12,7 +12,7 @@ en:
       date_only: "%B %d, %Y"
   appointment_mailer:
     common:
-      signature: "In Christ,\nFr. Youhanna Makin"
+      signature: "Yours,\nFr. Youhanna Makin"
       details: "Appointment Details"
       date: "Date"
       time: "Time"

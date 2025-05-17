@@ -25,7 +25,7 @@
     <div class="sm:col-span-3">
       <%= form.label :user_id, class: "block text-sm font-medium text-gray-700" %>
       <div class="mt-1">
-        <%= form.collection_select :user_id, User.users, :id, :name, { prompt: "Select a user" }, { class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" } %>
+        <%= form.collection_select :user_id, current_tenant.users.users, :id, :name, { prompt: "Select a user" }, { class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" } %>
       </div>
     </div>
 

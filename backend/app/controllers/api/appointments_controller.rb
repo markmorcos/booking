@@ -2,12 +2,14 @@ require_relative "../../services/whatsapp_service"
 
 module Api
   class AppointmentsController < Api::BaseController
+    include AppointmentStatusHandler
+
     # GET /api/appointments
     def index
-      @appointments = Appointment
-                        .where(booking_email: params[:email])
-                        .includes(:availability_slot)
-                        .future
+      @appointments = current_tenant.appointments
+                                 .includes(:user, :availability_slot)
+                                 .where(user: { email: params[:email] })
+                                 .future
 
       render json: @appointments, status: :ok
     end
@@ -15,7 +17,7 @@ module Api
     # POST /api/appointments
     def create
       begin
-        availability_slot = AvailabilitySlot.find(params[:availability_slot_id])
+        availability_slot = current_tenant.availability_slots.find(params[:availability_slot_id])
       rescue ActiveRecord::RecordNotFound
         render json: { errors: [ "Availability slot not found" ] }, status: :not_found
         return
@@ -31,35 +33,61 @@ module Api
         return
       end
 
-      @appointment = Appointment.new(appointment_params)
+      @appointment = current_tenant.appointments.new(appointment_params)
       @appointment.availability_slot = availability_slot
 
+      # Ensure we set the user from params or current_user
+      @appointment.user = if params.dig(:appointment, :user_id).present?
+                            User.find_by(id: params.dig(:appointment, :user_id))
+      else
+                            current_user
+      end
+
       if @appointment.save
-        AppointmentMailer.status_email(@appointment).deliver_now
-        ::WhatsappService.send_event_notification(@appointment, "pending") if @appointment.user.phone.present?
-        render json: @appointment, status: :created
+        if handle_status_change(@appointment, :pending)
+          render json: @appointment, status: :created
+        else
+          render json: { errors: [ "Failed to set appointment status" ] }, status: :unprocessable_entity
+        end
       else
         render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
       end
+    rescue StandardError => e
+      render json: { errors: [ "Failed to create appointment: #{e.message}" ] }, status: :unprocessable_entity
     end
 
     # PATCH /api/appointments/:id/cancel
     def cancel
-      @appointment = Appointment.find(params[:id])
+      begin
+        @appointment = current_tenant.appointments.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+        render json: { errors: [ "Appointment not found" ] }, status: :not_found
+        return
+      end
 
-      if @appointment.update(status: :cancelled)
-        AppointmentMailer.status_email(@appointment).deliver_now
-        ::WhatsappService.send_event_notification(@appointment, "cancelled") if @appointment.user.phone.present?
+      if @appointment.cancelled?
+        render json: { errors: [ "Appointment is already cancelled" ] }, status: :unprocessable_entity
+        return
+      end
+
+      if @appointment.completed? || @appointment.no_show?
+        render json: { errors: [ "Cannot cancel a completed or no-show appointment" ] }, status: :unprocessable_entity
+        return
+      end
+
+      if handle_status_change(@appointment, :cancelled)
         render json: @appointment, status: :ok
       else
-        render json: { errors: @appointment.errors.full_messages }, status: :unprocessable_entity
+        render json: { errors: [ "Failed to cancel appointment" ] }, status: :unprocessable_entity
       end
+    rescue StandardError => e
+      render json: { errors: [ "Failed to cancel appointment: #{e.message}" ] }, status: :unprocessable_entity
     end
 
     private
 
     def appointment_params
-      params.require(:appointment).permit(:user_id, :status)
+      params.require(:appointment).permit(:booking_email, :booking_name, :booking_phone)
     end
   end
 end

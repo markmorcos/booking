@@ -6,6 +6,8 @@ class Admin::BaseController < ApplicationController
   private
 
   def authorize_admin!
-    redirect_to home_path, alert: "You are not authorized to access this area" unless current_user&.admin?
+    unless current_user&.admin? && current_user.tenant == current_tenant
+      redirect_to home_path, alert: "You are not authorized to access this area"
+    end
   end
 end

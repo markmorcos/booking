@@ -1,24 +1,29 @@
 pending_appointment:
+  tenant: one
   user: user
   status: pending
   availability_slot: booked_slot
 
 confirmed_appointment:
+  tenant: one
   user: user
   status: confirmed
   availability_slot: booked_slot
 
 cancelled_appointment:
+  tenant: one
   user: user
   status: cancelled
   availability_slot: booked_slot
 
 completed_appointment:
+  tenant: one
   user: user
   status: completed
   availability_slot: booked_slot
 
 no_show_appointment:
+  tenant: one
   user: user
   status: no_show
   availability_slot: booked_slot

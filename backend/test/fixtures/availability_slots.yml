@@ -1,15 +1,19 @@
 past_slot:
+  tenant: one
   starts_at: <%= 1.day.ago.beginning_of_hour %>
   ends_at: <%= 1.day.ago.beginning_of_hour + 1.hour %>
 
 future_slot:
+  tenant: one
   starts_at: <%= 1.day.from_now.beginning_of_hour %>
   ends_at: <%= 1.day.from_now.beginning_of_hour + 1.hour %>
 
 booked_slot:
+  tenant: one
   starts_at: <%= 2.days.from_now.beginning_of_hour %>
   ends_at: <%= 2.days.from_now.beginning_of_hour + 1.hour %>
 
 available_slot:
+  tenant: one
   starts_at: <%= 3.days.from_now.beginning_of_hour %>
   ends_at: <%= 3.days.from_now.beginning_of_hour + 1.hour %>

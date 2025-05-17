@@ -2,8 +2,8 @@ module Api
   class AvailabilitySlotsController < Api::BaseController
     # GET /api/availability_slots
     def index
-      # Start with all future slots
-      @availability_slots = AvailabilitySlot.where("ends_at >= ?", Time.current)
+      # Start with all future slots for the current tenant
+      @availability_slots = current_tenant.availability_slots.where("ends_at >= ?", Time.current)
 
       if params[:month].present?
         # Parse month in YYYY-MM format and include all slots for that month
