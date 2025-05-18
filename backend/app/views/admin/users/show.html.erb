@@ -38,6 +38,7 @@
   </div>
 </div>
 
+<% if @user.appointments.any? %>
 <div class="mt-8">
   <h2 class="text-lg font-medium text-gray-900 mb-4">Appointments</h2>
   <div class="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -69,3 +70,4 @@
     </table>
   </div>
 </div> 
+<% end %>

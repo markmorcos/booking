@@ -19,11 +19,10 @@ class Admin::UsersController < Admin::BaseController
 
   def create
     @user = current_tenant.users.users.new(user_params)
-    @user.skip_confirmation!
 
     if @user.save
       @user.invite!
-      redirect_to admin_user_path(@user), notice: "User was successfully created and invitation email sent."
+      redirect_to admin_users_path, notice: "User was successfully created and invitation email sent."
     else
       render :new, status: :unprocessable_entity
     end
@@ -44,7 +43,7 @@ class Admin::UsersController < Admin::BaseController
 
   def resend_invitation
     @user.invite!
-    redirect_to admin_user_path(@user), notice: "Invitation was successfully resent."
+    redirect_to admin_users_path, notice: "Invitation was successfully resent."
   end
 
   private

@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  devise :invitable, :database_authenticatable, :rememberable, :confirmable, :recoverable, :invitable
+  devise :invitable, :database_authenticatable, :rememberable, :recoverable, :invitable
 
   attribute :role, :string, default: "user"
   attribute :name, :string

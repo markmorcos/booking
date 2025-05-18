@@ -4,11 +4,12 @@ Rails.application.routes.draw do
     Tenant.exists?(path: request.params[:tenant_path])
   end
 
+  # Non-invitation Devise routes
   devise_for :users,
             path: "admin",
             path_names: { sign_in: "login", sign_out: "logout" },
-            controllers: { invitations: "users/invitations" },
-            only: [ :sessions, :passwords, :confirmations, :invitations ]
+            skip: [ :invitations ],
+            only: [ :sessions, :passwords, :confirmations ]
 
   root to: "home#index"
 
@@ -16,39 +17,43 @@ Rails.application.routes.draw do
 
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Tenant-specific routes
-  scope ":tenant_path", constraints: tenant_constraint do
-    # Public routes for each tenant
-    resources :appointments, only: [ :new, :create, :show ]
-    resources :availability_slots, only: [ :index ]
+  # Invitation routes only, with explicit path
+  devise_for :users,
+          path: "admin",
+          controllers: { invitations: "users/invitations" },
+          only: [ :invitations ],
+          skip: [ :sessions, :passwords, :confirmations ]
 
-    # Admin web interface
-    namespace :admin do
-      root to: "dashboard#index"
+  # Public routes for each tenant
+  resources :appointments, only: [ :new, :create, :show ]
+  resources :availability_slots, only: [ :index ]
 
-      resources :availability_slots do
-        collection do
-          get :new_batch
-          post :create_batch
-          patch :update_durations
-          delete :delete_range
-        end
+  # Admin web interface
+  namespace :admin do
+    root to: "dashboard#index"
+
+    resources :availability_slots do
+      collection do
+        get :new_batch
+        post :create_batch
+        patch :update_durations
+        delete :delete_range
       end
+    end
 
-      resources :appointments do
-        member do
-          patch :confirm
-          patch :cancel
-          patch :reschedule
-          patch :complete
-          patch :mark_no_show
-        end
+    resources :appointments do
+      member do
+        patch :confirm
+        patch :cancel
+        patch :reschedule
+        patch :complete
+        patch :mark_no_show
       end
+    end
 
-      resources :users do
-        member do
-          post :resend_invitation
-        end
+    resources :users do
+      member do
+        post :resend_invitation
       end
     end
   end

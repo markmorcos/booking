@@ -1,8 +1,18 @@
 class Users::InvitationsController < Devise::InvitationsController
-  include TenantContext
-
-  before_action :set_current_tenant
   before_action :configure_permitted_parameters, if: :devise_controller?
+
+  def create
+    self.resource = invite_resource
+    resource.save
+
+    if resource.errors.empty?
+      set_flash_message :notice, :send_instructions, email: resource.email if is_flashing_format?
+      redirect_to after_invite_path_for(resource)
+    else
+      flash[:alert] = resource.errors.full_messages.to_sentence
+      render :new, status: :unprocessable_entity
+    end
+  end
 
   protected
 
@@ -11,16 +21,10 @@ class Users::InvitationsController < Devise::InvitationsController
   end
 
   def after_invite_path_for(resource)
-    admin_user_path(resource)
+    admin_users_path
   end
 
   def after_accept_path_for(resource)
-    admin_root_path
-  end
-
-  private
-
-  def default_url_options
-    { tenant_path: current_tenant&.path }
+    root_path
   end
 end

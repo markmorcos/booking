@@ -8,14 +8,10 @@ module TenantContext
   private
 
   def current_tenant
-    @current_tenant ||= Tenant.find_by(path: params[:tenant_path])
+    @current_tenant ||= current_user&.tenant
   end
 
   def set_current_tenant
-    @current_tenant = if current_user&.admin?
-      current_user.tenant
-    else
-      Tenant.find_by(path: params[:tenant_path])
-    end
+    @current_tenant = current_user&.tenant
   end
 end
