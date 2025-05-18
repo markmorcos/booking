@@ -1,34 +1,206 @@
-<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-  <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-      Booking System
-    </h2>
-    <p class="mt-2 text-center text-sm text-gray-600">
-      Please login to access the booking system
+<div class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-800 to-indigo-700 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+  <!-- Animated Background Elements -->
+  <div class="absolute inset-0 overflow-hidden opacity-10">
+    <div class="absolute -top-20 -left-20 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+    <div class="absolute top-0 -right-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-20 left-20 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+  </div>
+
+  <div class="sm:mx-auto sm:max-w-4xl z-10">
+    <h1 class="mt-6 text-center text-4xl font-extrabold tracking-tight md:text-5xl">
+      <span class="block text-gray-900">Your Premium</span>
+      <span class="block text-indigo-600">Booking Experience</span>
+    </h1>
+    <p class="mt-3 text-center text-lg text-gray-600 sm:mt-5">
+      Seamless scheduling with our powerful booking system
     </p>
   </div>
 
-  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+  <div class="mt-8 sm:mx-auto sm:max-w-4xl z-10">
+    <div class="bg-white bg-opacity-95 backdrop-filter backdrop-blur-sm py-8 px-4 shadow-2xl sm:rounded-xl sm:px-10 transform hover:scale-[1.02] transition-all duration-300">
       <% if user_signed_in? %>
         <div class="flex flex-col items-center">
-          <p class="mb-4 text-gray-700">You are signed in as <%= current_user.email %></p>
+          <div class="w-full flex justify-center mb-6">
+            <div class="h-24 w-24 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+              <svg class="h-12 w-12" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+          </div>
+          <p class="mb-4 text-gray-700 text-center">Welcome, <span class="font-semibold text-indigo-600"><%= current_user.email %></span></p>
           
           <% if current_user.admin? %>
-            <%= link_to "Go to Admin Dashboard", admin_root_path, class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+            <%= link_to admin_root_path, class: "group w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300" do %>
+              <span class="flex items-center">
+                <svg class="h-5 w-5 mr-2 transform group-hover:scale-110 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm9 4a1 1 0 10-2 0v6a1 1 0 102 0V7zm-3 2a1 1 0 10-2 0v4a1 1 0 102 0V9zm-3 3a1 1 0 10-2 0v1a1 1 0 102 0v-1z" clip-rule="evenodd" />
+                </svg>
+                Go to Admin Dashboard
+              </span>
+            <% end %>
           <% else %>
-            <p class="mb-4 text-amber-700">Please use the <a href="https://play.google.com/store/apps/details?id=tech.morcos.booking" target="_blank" class="text-indigo-600 hover:text-indigo-700">mobile app</a> to start booking</p>
+            <div class="mb-6 rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:shadow-xl">
+              <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-700 opacity-90"></div>
+                <img class="w-full h-48 object-cover opacity-40" src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" alt="Calendar and scheduling">
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <h3 class="text-2xl font-bold text-white px-4 text-center tracking-wide drop-shadow-md">Unlock Premium Booking Features</h3>
+                </div>
+              </div>
+              
+              <div class="p-5 bg-gradient-to-b from-indigo-50 to-white">
+                <p class="mb-4 text-gray-700 font-medium">Experience seamless scheduling with our dedicated mobile app:</p>
+                
+                <div class="space-y-3" style="margin-bottom: 20px;">
+                  <div class="flex items-start">
+                    <div class="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-green-500 mt-0.5">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <p class="ml-3 text-gray-700">Smart scheduling with calendar integration</p>
+                  </div>
+                  <div class="flex items-start">
+                    <div class="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-green-500 mt-0.5">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <p class="ml-3 text-gray-700">Real-time notifications and reminders</p>
+                  </div>
+                  <div class="flex items-start">
+                    <div class="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-green-500 mt-0.5">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <p class="ml-3 text-gray-700">Offline access to your bookings</p>
+                  </div>
+                  <div class="flex items-start">
+                    <div class="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-green-500 mt-0.5">
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <p class="ml-3 text-gray-700">Quick booking with personalized preferences</p>
+                  </div>
+                </div>
+                
+                <div class="mb-5">
+                  <a href="https://play.google.com/store/apps/details?id=tech.morcos.booking" target="_blank" class="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-sm text-indigo-700 font-medium rounded-md shadow-sm hover:bg-gray-50 transition-all duration-300 mx-auto">
+                    <svg class="h-4 w-4 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    View on Play Store
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="w-full flex justify-between space-x-4 mt-2 mb-4">
+              <div class="flex-1 bg-indigo-50 rounded-lg p-3 text-center">
+                <div class="font-bold text-indigo-600 text-lg">50+</div>
+                <div class="text-xs text-gray-600">Happy Users</div>
+              </div>
+              <div class="flex-1 bg-purple-50 rounded-lg p-3 text-center">
+                <div class="font-bold text-purple-600 text-lg">24/7</div>
+                <div class="text-xs text-gray-600">Availability</div>
+              </div>
+              <div class="flex-1 bg-pink-50 rounded-lg p-3 text-center">
+                <div class="font-bold text-pink-600 text-lg">100%</div>
+                <div class="text-xs text-gray-600">Satisfaction</div>
+              </div>
+            </div>
           <% end %>
           
-          <div class="mt-4">
-            <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+          <div class="mt-4 w-full">
+            <%= button_to destroy_user_session_path, method: :delete, class: "w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300" do %>
+              <span class="flex items-center">
+                <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V7.414L11.414 3H3zm9 2.586L15.586 9H12V5.586zM4 4h7v5h5v6H4V4z" clip-rule="evenodd" />
+                </svg>
+                Sign Out
+              </span>
+            <% end %>
           </div>
         </div>
       <% else %>
         <div class="space-y-4">
-          <%= link_to "Login", new_user_session_path, class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+          <div class="flex justify-center mb-6">
+            <div class="h-20 w-20 rounded-full bg-indigo-100 flex items-center justify-center">
+              <svg class="h-10 w-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+          </div>
+          <h3 class="text-center text-lg font-bold text-gray-800 mb-2">Sign In to Your Account</h3>
+          <p class="text-center text-sm text-gray-600 mb-4">Access your bookings and appointments</p>
+          
+          <%= link_to "Login", new_user_session_path, class: "block w-32 mx-auto py-2 px-4 text-center text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm transition-colors duration-200" %>
+        </div>
+      <% end %>
+      <% unless user_signed_in? %>
+        <div class="mt-8 sm:mt-10 sm:mx-auto sm:w-full sm:max-w-4xl z-10">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div class="bg-white bg-opacity-95 backdrop-filter backdrop-blur-sm p-4 rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105">
+              <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-indigo-600 mb-4">
+                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">Save Time</h3>
+              <p class="text-sm text-gray-600">Book appointments in seconds with our intuitive interface.</p>
+            </div>
+            
+            <div class="bg-white bg-opacity-95 backdrop-filter backdrop-blur-sm p-4 rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105">
+              <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-indigo-600 mb-4">
+                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">Smart Reminders</h3>
+              <p class="text-sm text-gray-600">Never miss an appointment with our notification system.</p>
+            </div>
+            
+            <div class="bg-white bg-opacity-95 backdrop-filter backdrop-blur-sm p-4 rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105">
+              <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-indigo-600 mb-4">
+                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">Mobile Friendly</h3>
+              <p class="text-sm text-gray-600">Access your bookings anytime, anywhere with our mobile app.</p>
+            </div>
+          </div>
         </div>
       <% end %>
     </div>
   </div>
 </div>
+
+<style>
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+</style>
