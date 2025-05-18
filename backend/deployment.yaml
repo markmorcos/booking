@@ -1,4 +1,4 @@
-chartVersion: 0.2.5
+chartVersion: 0.2.7
 
 project:
   name: "booking"
@@ -80,3 +80,8 @@ deployments:
 services:
   - name: booking-service
     port: 80
+
+jobs:
+  - name: prepare-database-job
+    image: markmorcos/booking
+    command: ["bundle", "exec", "rails", "db:create", "db:migrate", "db:seed"]
