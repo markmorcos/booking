@@ -51,8 +51,12 @@ class Admin::AppointmentsController < Admin::BaseController
   end
 
   def destroy
-    @appointment.destroy
-    redirect_to admin_appointments_path, notice: "Appointment was successfully destroyed."
+    if handle_status_change(@appointment, :cancelled)
+      @appointment.destroy
+      redirect_to admin_appointments_path, notice: "Appointment was successfully deleted."
+    else
+      redirect_to admin_appointment_path(@appointment), alert: "Failed to destroy appointment."
+    end
   end
 
   def confirm

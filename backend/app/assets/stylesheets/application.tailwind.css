@@ -30,15 +30,27 @@
   }
 
   div.simple-calendar .calendar-heading nav {
-    @apply flex items-center justify-between order-2 text-sm text-gray-500;
+    display: flex;
+    justify-content: space-between;
+    order: 2;
+    font-weight: normal;
+    font-size: 12px;
+    color: #6b7280;
   }
 
   div.simple-calendar .calendar-heading a {
-    @apply text-sm text-gray-500 hover:text-gray-700 font-normal;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: normal;
+    color: #6b7280;
+  }
+
+  div.simple-calendar .calendar-heading a:hover {
+    text-decoration: none;
   }
 
   div.simple-calendar table {
-    @apply w-full;
+    width: 100% !important;
   }
 
   div.simple-calendar table th {

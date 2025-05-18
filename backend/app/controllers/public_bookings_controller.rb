@@ -1,7 +1,10 @@
 class PublicBookingsController < ApplicationController
+  include AppointmentStatusHandler
+
   before_action :set_tenant
 
   def show
+    return redirect_to public_booking_path if params[:date].present? && params[:date] !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/
     @date = params[:date].present? ? Date.parse(params[:date]) : Date.today
     start_date = @date.beginning_of_month.beginning_of_week
     end_date = @date.end_of_month.end_of_week
@@ -43,8 +46,8 @@ class PublicBookingsController < ApplicationController
     @appointment = @tenant.appointments.new(user: @user, availability_slot: @slot)
 
     if @appointment.save
-      AppointmentMailer.status_email(@appointment).deliver_later
-      redirect_to public_booking_confirmation_path(@appointment), notice: "Appointment booked successfully!"
+      send_notifications(@appointment, "pending")
+      redirect_to public_booking_confirmation_path(@appointment)
     else
       render :details, status: :unprocessable_entity
     end

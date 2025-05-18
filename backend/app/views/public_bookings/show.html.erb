@@ -22,7 +22,7 @@
           </div>
 
           <div data-controller="calendar">
-            <%= month_calendar(attribute: :starts_at, events: @month_slots) do |date, slots| %>
+            <%= month_calendar(attribute: :starts_at, events: @month_slots, start_date_param: :date) do |date, slots| %>
               <%= link_to public_booking_path(@tenant.path, date: date), 
                   class: class_names(
                     "calendar-day",
