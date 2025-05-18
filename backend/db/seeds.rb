@@ -1,13 +1,14 @@
 # Create tenant
-tenants = [
-  Tenant.create!(path: "me"),
-  Tenant.create!(path: "youhanna")
-]
+tenants = ["me", "youhanna"]
+
+tenants.each do |tenant|
+  Tenant.create!(path: tenant) unless Tenant.exists?(path: tenant)
+end
 
 # Create users for the tenant
 users = [
   {
-    tenant: tenants.first,
+    tenant: Tenant.first,
     email: 'mark.yehia@gmail.com',
     password: ENV['ADMIN_PASSWORD'],
     role: "admin",
@@ -16,7 +17,7 @@ users = [
     confirmed_at: Time.current
   },
   {
-    tenant: tenants.last,
+    tenant: Tenant.last,
     email: 'youhanna_makin@yahoo.com',
     password: ENV['ADMIN_PASSWORD'],
     role: "admin",
@@ -31,5 +32,5 @@ users.each do |user_attrs|
 end
 
 puts "Seed data created successfully!"
-puts "Tenants: #{tenants.map { |t| t[:path] }.join(', ')}"
+puts "Tenants: #{tenants.join(', ')}"
 puts "User emails: #{users.map { |u| u[:email] }.join(', ')}"
