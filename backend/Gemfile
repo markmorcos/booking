@@ -58,6 +58,12 @@ gem "thruster", require: false
 # Use Active Model Serializers for JSON API responses
 gem "active_model_serializers", "~> 0.10.0"
 
+# Calendar invites
+gem "icalendar", "~> 2.9"
+
+# Calendar UI
+gem "simple_calendar", "~> 3.0"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

@@ -60,14 +60,21 @@ Rails.application.routes.draw do
 
   # API routes
   namespace :api do
-    scope ":tenant_path", constraints: tenant_constraint do
-      resources :availability_slots, only: [ :index ]
-      resources :appointments, only: [ :index, :create ] do
-        member do
-          patch :cancel
-          patch :reschedule
-        end
+    resources :availability_slots, only: [ :index ]
+    resources :appointments, only: [ :index, :create ] do
+      member do
+        patch :cancel
+        patch :reschedule
       end
     end
+  end
+
+  # Public booking routes
+  scope "/b/:tenant_path", constraints: tenant_constraint do
+    get "/", to: "public_bookings#show", as: :public_booking
+    get "/details/:slot_id", to: "public_bookings#details", as: :public_booking_details
+    post "/details/:slot_id", to: "public_bookings#create", as: :create_public_booking
+    get "/confirmation/:id", to: "public_bookings#confirmation", as: :public_booking_confirmation
+    get "/confirmation/:id/calendar", to: "public_bookings#calendar", as: :public_booking_calendar
   end
 end

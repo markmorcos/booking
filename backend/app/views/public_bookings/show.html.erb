@@ -1,0 +1,59 @@
+<%# Step 1: Date and Time Selection %>
+<div class="min-h-screen bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <%# Header %>
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-900 mb-3">
+        Meet with <%= @tenant.owner.name %>
+      </h1>
+      <p class="text-lg text-gray-600">
+        Choose a time that works best for you. The meeting will be confirmed via email.
+      </p>
+    </div>
+
+    <%# Main Content %>
+    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-gray-200">
+        <%# Calendar Section %>
+        <div class="p-6 lg:p-8">
+          <div class="mb-6">
+            <h2 class="text-xl font-semibold text-gray-900">Select a Date</h2>
+            <p class="mt-1 text-sm text-gray-500">Available time slots are highlighted</p>
+          </div>
+
+          <div data-controller="calendar">
+            <%= month_calendar(attribute: :starts_at, events: @month_slots) do |date, slots| %>
+              <%= link_to public_booking_path(@tenant.path, date: date), 
+                  class: class_names(
+                    "calendar-day",
+                    "has-slots": slots.any?,
+                    "is-today": date == Date.today,
+                    "is-selected": date == @date
+                  ),
+                  data: { 
+                    turbo_frame: "availability_slots",
+                    turbo_action: "advance",
+                    calendar_target: "day",
+                    action: "click->calendar#select"
+                  } do %>
+                <%= date.day %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <%# Time Slots Section %>
+        <div class="p-6 lg:p-8">
+          <%= turbo_frame_tag "availability_slots" do %>
+            <%= render "slots" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <%# Timezone Notice %>
+    <div class="mt-8 text-center text-sm text-gray-500">
+      <p>All times shown in your local timezone: <span class="font-medium text-gray-900"><%= Time.zone.name %></span></p>
+    </div>
+  </div>
+</div> 

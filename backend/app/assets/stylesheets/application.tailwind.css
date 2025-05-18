@@ -2,12 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
-/*
-
 @layer components {
+  /* Simple Calendar Styles */
+  div.simple-calendar {
+    @apply w-full;
+  }
+
+  div.simple-calendar .calendar-heading {
+    @apply flex items-center justify-between mb-6;
+  }
+
+  div.simple-calendar .calendar-heading a {
+    @apply text-sm text-gray-600 hover:text-gray-900;
+  }
+
+  div.simple-calendar .calendar-title {
+    @apply text-base font-medium text-gray-900;
+  }
+
+  /* Calendar Navigation */
+  div.simple-calendar .calendar-heading {
+    @apply flex flex-col gap-2;
+  }
+
+  div.simple-calendar .calendar-title {
+    @apply text-xl font-semibold text-gray-900 order-1;
+  }
+
+  div.simple-calendar .calendar-heading nav {
+    @apply flex items-center justify-between order-2 text-sm text-gray-500;
+  }
+
+  div.simple-calendar .calendar-heading a {
+    @apply text-sm text-gray-500 hover:text-gray-700 font-normal;
+  }
+
+  div.simple-calendar table {
+    @apply w-full;
+  }
+
+  div.simple-calendar table th {
+    @apply text-xs font-medium text-gray-500 p-2 text-center;
+  }
+
+  div.simple-calendar table td {
+    @apply p-0 align-top border border-gray-200;
+    height: 40px !important;
+  }
+
+  div.simple-calendar .calendar-day {
+    @apply block w-full h-full p-2 text-sm text-center hover:bg-gray-50;
+  }
+
+  div.simple-calendar .calendar-day.has-slots {
+    @apply bg-indigo-50 text-indigo-600 font-medium hover:bg-indigo-100;
+  }
+
+  div.simple-calendar .calendar-day.is-today {
+    @apply font-bold;
+  }
+
+  div.simple-calendar .calendar-day.is-selected {
+    @apply bg-indigo-100;
+  }
+
+  div.simple-calendar .prev-month,
+  div.simple-calendar .next-month {
+    @apply text-gray-300;
+  }
+
+  div.simple-calendar .prev-month .calendar-day,
+  div.simple-calendar .next-month .calendar-day {
+    @apply text-gray-300 hover:bg-transparent cursor-default;
+  }
+
+  /* Other component styles can go here */
   .btn-primary {
     @apply py-2 px-4 bg-blue-200;
   }
 }
-
-*/

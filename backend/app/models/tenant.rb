@@ -8,6 +8,10 @@ class Tenant < ApplicationRecord
 
   before_validation :normalize_path
 
+  def owner
+    users.admins.first
+  end
+
   private
 
   def normalize_path
