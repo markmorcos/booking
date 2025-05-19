@@ -15,7 +15,7 @@ class WhatsappService
   def send_event_notification(appointment, type)
     @type = type
 
-    return false unless appointment.booking_phone.present?
+    return false unless appointment.user.phone.present?
 
     puts(build_payload(appointment).to_json)
 
@@ -56,7 +56,7 @@ class WhatsappService
   def build_payload(appointment)
     {
       messaging_product: "whatsapp",
-      to: format_phone_number(appointment.booking_phone),
+      to: format_phone_number(appointment.user.phone),
       type: "template",
       template: {
         name: TEMPLATE_NAME,

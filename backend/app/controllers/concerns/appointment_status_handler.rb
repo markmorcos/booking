@@ -5,7 +5,7 @@ module AppointmentStatusHandler
     def send_notifications(appointment, status)
       begin
         AppointmentMailer.status_email(appointment).deliver_now
-        ::WhatsappService.send_event_notification(appointment, status) if appointment.booking_phone.present?
+        ::WhatsappService.send_event_notification(appointment, status) if appointment.user.phone.present?
       rescue StandardError => e
         Rails.logger.error("Failed to send notifications for appointment #{appointment.id}: #{e.message}")
         # Don't raise the error - we want the status change to succeed even if notifications fail
