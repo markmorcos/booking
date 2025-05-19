@@ -24,13 +24,9 @@ pgdatabase=${pgdatabase:-booking_development}
 read -p "Enter PostgreSQL port (default: 5432): " pgport
 pgport=${pgport:-5432}
 
-# Create postgres-secrets
-kubectl -n "$namespace" create secret generic postgres-secrets \
-  --from-literal=PGHOST="$pghost" \
-  --from-literal=PGUSER="$pguser" \
-  --from-literal=PGPASSWORD="$pgpassword" \
-  --from-literal=PGDATABASE="$pgdatabase" \
-  --from-literal=PGPORT="$pgport" \
+# Create database-secret
+kubectl -n "$namespace" create secret generic database-secret \
+  --from-literal=DATABASE_URL="postgresql://$pguser:$pgpassword@$pghost:$pgport/$pgdatabase" \
   --dry-run=client -o yaml | kubectl apply -f -
 
 # Create rails-secret
