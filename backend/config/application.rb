@@ -10,7 +10,7 @@ module Booking
 
     config.autoload_lib(ignore: %w[assets tasks])
 
-    config.time_zone = "Africa/Cairo"
+    config.time_zone = "Europe/Berlin"
     config.active_record.default_timezone = :local
   end
 end
