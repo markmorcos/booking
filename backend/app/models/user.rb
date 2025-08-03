@@ -10,7 +10,6 @@ class User < ApplicationRecord
 
   validates :name, presence: true
   validates :email, presence: true, uniqueness: { scope: :tenant_id, case_sensitive: false }
-  validates :phone, presence: true
   validates :phone, format: { with: /\A[0-9\+\-\(\) ]+\z/, message: "is invalid" }, if: -> { phone.present? }
 
   scope :admins, -> { where(role: "admin") }
