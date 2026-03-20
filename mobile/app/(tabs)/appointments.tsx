@@ -1,222 +1,154 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from 'react';
 import {
-  StyleSheet,
-  FlatList,
-  View,
-  Text,
   ActivityIndicator,
+  FlatList,
   RefreshControl,
+  SafeAreaView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
-  Alert,
-  Platform,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getUserAppointments, Appointment } from "../../api/client";
-import AppointmentCard from "../../components/AppointmentCard";
-import { Colors, Spacing, FontSize } from "../../constants/theme";
-import { Feather } from "@expo/vector-icons";
+  View,
+} from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAppointments } from '@/hooks/useAppointments';
+import AppointmentCard from '@/components/AppointmentCard';
+import type { AppointmentStatus } from '@/types';
+
+type FilterTab = 'all' | AppointmentStatus;
+
+const USER_TABS: FilterTab[] = ['all', 'pending', 'confirmed', 'completed'];
+const ADMIN_TABS: FilterTab[] = [
+  'all',
+  'pending',
+  'confirmed',
+  'completed',
+  'cancelled',
+  'no_show',
+];
 
 export default function AppointmentsScreen() {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const { t } = useTranslation();
+  const { isAdmin } = useAuth();
+  const [activeTab, setActiveTab] = useState<FilterTab>('all');
 
-  const fetchAppointments = useCallback(async (showRefresh = false) => {
-    try {
-      if (!showRefresh) setLoading(true);
-      const email = await AsyncStorage.getItem("userEmail");
-      setUserEmail(email);
+  const filters =
+    activeTab === 'all' ? undefined : { status: activeTab as AppointmentStatus };
 
-      if (!email) {
-        setAppointments([]);
-        setLoading(false);
-        setRefreshing(false);
-        return;
-      }
+  const {
+    data: appointments = [],
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useAppointments(filters);
 
-      const data = await getUserAppointments();
-      setAppointments(data);
-      setError(null);
-    } catch (err) {
-      console.error("Error in fetchAppointments:", err);
-      setError(
-        "Failed to load appointments. Please check your network connection and try again."
-      );
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
+  const tabs = isAdmin ? ADMIN_TABS : USER_TABS;
 
-  useEffect(() => {
-    fetchAppointments();
-  }, [fetchAppointments]);
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchAppointments(true);
+  const getTabLabel = (tab: FilterTab): string => {
+    if (tab === 'all') return t('appointments.all');
+    if (tab === 'no_show') return t('appointments.noShow');
+    return t(`appointments.${tab}`);
   };
-
-  const handleRetry = () => {
-    setError(null);
-    fetchAppointments();
-  };
-
-  const showNetworkTroubleshooting = () => {
-    const platform = Platform.OS === "ios" ? "iOS" : "Android";
-    Alert.alert(
-      "Network Troubleshooting",
-      `Make sure that:\n\n1. Your ${platform} device is connected to the internet\n2. The backend server is running (Rails)\n3. Your device can reach the server\n\nIf using an emulator, make sure the server is running on the correct port (default: 3000).`,
-      [{ text: "OK" }]
-    );
-  };
-
-  const handleAppointmentCancel = (appointmentId: number) => {
-    // Update the local state to mark the appointment as cancelled
-    setAppointments((currentAppointments) =>
-      currentAppointments.map((appointment) =>
-        appointment.id === appointmentId
-          ? { ...appointment, status: "cancelled" }
-          : appointment
-      )
-    );
-  };
-
-  if (loading && !refreshing) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.loadingText}>Loading your appointments...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Feather name="alert-circle" size={48} color={Colors.error} />
-        <Text style={styles.errorText}>{error}</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleRetry}>
-            <Text style={styles.buttonText}>Try Again</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.helpButton]}
-            onPress={showNetworkTroubleshooting}
-          >
-            <Text style={styles.buttonText}>Help</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  if (!userEmail) {
-    return (
-      <View style={styles.centered}>
-        <Feather name="user-x" size={48} color={Colors.textLight} />
-        <Text style={styles.emptyText}>No appointments found</Text>
-        <Text style={styles.emptySubText}>
-          Book an appointment first to see your bookings
-        </Text>
-      </View>
-    );
-  }
-
-  if (appointments.length === 0) {
-    return (
-      <View style={styles.centered}>
-        <Feather name="calendar" size={48} color={Colors.textLight} />
-        <Text style={styles.emptyText}>No appointments found</Text>
-        <Text style={styles.emptySubText}>
-          You haven't booked any appointments yet
-        </Text>
-      </View>
-    );
-  }
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={appointments}
-        renderItem={({ item }) => (
-          <AppointmentCard
-            appointment={item}
-            onCancelSuccess={handleAppointmentCancel}
-          />
-        )}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            colors={[Colors.primary]}
-            tintColor={Colors.primary}
-          />
-        }
-      />
-    </View>
+    <SafeAreaView style={styles.container}>
+      {/* Filter Tabs */}
+      <View style={styles.tabsContainer}>
+        <FlatList
+          data={tabs}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item}
+          contentContainerStyle={styles.tabsList}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[styles.tab, activeTab === item && styles.activeTab]}
+              onPress={() => setActiveTab(item)}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === item && styles.activeTabText,
+                ]}
+              >
+                {getTabLabel(item)}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+
+      {/* Appointments List */}
+      {isLoading ? (
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#2563EB" />
+        </View>
+      ) : (
+        <FlatList
+          data={appointments}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <AppointmentCard appointment={item} />}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+          }
+          ListEmptyComponent={
+            <View style={styles.centered}>
+              <Text style={styles.emptyText}>
+                {t('appointments.noAppointments')}
+              </Text>
+            </View>
+          }
+        />
+      )}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#F3F4F6',
+  },
+  tabsContainer: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  tabsList: {
+    paddingHorizontal: 12,
+    gap: 8,
+  },
+  tab: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
+  },
+  activeTab: {
+    backgroundColor: '#2563EB',
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#6B7280',
+  },
+  activeTabText: {
+    color: '#FFFFFF',
   },
   listContent: {
-    padding: Spacing.md,
+    padding: 16,
+    paddingBottom: 32,
   },
   centered: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: Colors.background,
-    padding: Spacing.lg,
-  },
-  loadingText: {
-    marginTop: Spacing.md,
-    color: Colors.text,
-    fontSize: FontSize.md,
-  },
-  errorText: {
-    marginTop: Spacing.md,
-    color: Colors.error,
-    fontSize: FontSize.md,
-    textAlign: "center",
-    marginBottom: Spacing.md,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    marginTop: Spacing.sm,
-  },
-  button: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderRadius: 8,
-    marginHorizontal: Spacing.xs,
-  },
-  helpButton: {
-    backgroundColor: Colors.textLight,
-  },
-  buttonText: {
-    color: Colors.white,
-    fontWeight: "600",
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
   },
   emptyText: {
-    marginTop: Spacing.md,
-    fontSize: FontSize.lg,
-    fontWeight: "600",
-    color: Colors.text,
-  },
-  emptySubText: {
-    marginTop: Spacing.xs,
-    fontSize: FontSize.md,
-    color: Colors.textLight,
-    textAlign: "center",
+    fontSize: 16,
+    color: '#9CA3AF',
   },
 });
