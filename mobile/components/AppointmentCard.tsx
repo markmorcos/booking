@@ -1,193 +1,112 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import { Appointment, cancelAppointment } from "../api/client";
-import {
-  FontSize,
-  Colors,
-  Spacing,
-  BorderRadius,
-  Shadow,
-} from "../constants/theme";
-import { formatDate, formatTime } from "../utils/dateFormatter";
-import StatusBadge from "./StatusBadge";
-import { Feather } from "@expo/vector-icons";
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useAuth } from '@/contexts/AuthContext';
+import StatusBadge from './StatusBadge';
+import type { Appointment } from '@/types';
+import { formatDate, formatTimeRange } from '@/utils/date';
 
 interface AppointmentCardProps {
   appointment: Appointment;
-  onCancelSuccess?: (appointmentId: number) => void;
 }
 
-export default function AppointmentCard({
-  appointment,
-  onCancelSuccess,
-}: AppointmentCardProps) {
-  const handleCancel = () => {
-    Alert.alert(
-      "Cancel Appointment",
-      "Are you sure you want to cancel this appointment?",
-      [
-        {
-          text: "No",
-          style: "cancel",
-        },
-        {
-          text: "Yes, Cancel",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await cancelAppointment(appointment.id);
-              if (onCancelSuccess) {
-                onCancelSuccess(appointment.id);
-              }
-              Alert.alert(
-                "Appointment Cancelled",
-                "Your appointment has been cancelled successfully."
-              );
-            } catch (error) {
-              Alert.alert(
-                "Error",
-                "Failed to cancel the appointment. Please try again."
-              );
-            }
-          },
-        },
-      ]
-    );
+export default function AppointmentCard({ appointment }: AppointmentCardProps) {
+  const router = useRouter();
+  const { locale } = useLocale();
+  const { isAdmin } = useAuth();
+
+  const handlePress = () => {
+    router.push(`/appointment/${appointment.id}`);
   };
 
-  // Don't show cancel button for already cancelled, completed, or no-show appointments
-  const canCancel =
-    appointment.status !== "cancelled" &&
-    appointment.status !== "completed" &&
-    appointment.status !== "no_show";
+  const slot = appointment.slot;
+  const dateText = slot ? formatDate(slot.starts_at, locale) : '';
+  const timeText = slot
+    ? formatTimeRange(slot.starts_at, slot.ends_at, locale)
+    : '';
 
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={handlePress}
+      activeOpacity={0.7}
+    >
       <View style={styles.header}>
         <StatusBadge status={appointment.status} />
-        <Text style={styles.name}>{appointment.user.name}</Text>
       </View>
-
-      <View style={styles.detailsContainer}>
-        <View style={styles.detailRow}>
-          <Feather
-            name="calendar"
-            size={16}
-            color={Colors.primary}
-            style={styles.icon}
-          />
-          <Text style={styles.detailText}>
-            {formatDate(appointment.availabilitySlot.startsAt)}
-          </Text>
+      {slot && (
+        <View style={styles.details}>
+          <Text style={styles.dateText}>{dateText}</Text>
+          <Text style={styles.timeText}>{timeText}</Text>
         </View>
-
-        <View style={styles.detailRow}>
-          <Feather
-            name="clock"
-            size={16}
-            color={Colors.primary}
-            style={styles.icon}
-          />
-          <Text style={styles.detailText}>
-            {formatTime(appointment.availabilitySlot.startsAt)} -{" "}
-            {formatTime(appointment.availabilitySlot.endsAt)}
-          </Text>
+      )}
+      {isAdmin && appointment.user && (
+        <View style={styles.userRow}>
+          <Text style={styles.userName}>{appointment.user.name}</Text>
+          <Text style={styles.userEmail}>{appointment.user.email}</Text>
         </View>
-
-        <View style={styles.detailRow}>
-          <Feather
-            name="mail"
-            size={16}
-            color={Colors.primary}
-            style={styles.icon}
-          />
-          <Text style={styles.detailText}>{appointment.user.email}</Text>
-        </View>
-
-        {appointment.user.phone && (
-          <View style={styles.detailRow}>
-            <Feather
-              name="phone"
-              size={16}
-              color={Colors.primary}
-              style={styles.icon}
-            />
-            <Text style={styles.detailText}>{appointment.user.phone}</Text>
-          </View>
-        )}
-
-        {canCancel && (
-          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-            <Feather
-              name="x-circle"
-              size={16}
-              color={Colors.white}
-              style={styles.cancelIcon}
-            />
-            <Text style={styles.cancelText}>Cancel Appointment</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    </View>
+      )}
+      {appointment.notes ? (
+        <Text style={styles.notes} numberOfLines={2}>
+          {appointment.notes}
+        </Text>
+      ) : null}
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Colors.card,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
-    marginBottom: Spacing.md,
-    ...Shadow,
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.primary,
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: Spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
   },
-  name: {
-    fontSize: FontSize.lg,
-    fontWeight: "600",
-    color: Colors.text,
-    flex: 1,
-    textAlign: "right",
+  details: {
+    marginBottom: 4,
   },
-  detailsContainer: {
+  dateText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  timeText: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  userRow: {
+    marginTop: 8,
+    paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: "#eee",
-    paddingTop: Spacing.sm,
+    borderTopColor: '#F3F4F6',
   },
-  detailRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: Spacing.xs,
+  userName: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
   },
-  icon: {
-    marginRight: 8,
+  userEmail: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginTop: 2,
   },
-  detailText: {
-    fontSize: FontSize.md,
-    color: Colors.text,
-  },
-  cancelButton: {
-    backgroundColor: Colors.error,
-    borderRadius: BorderRadius.sm,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-    marginTop: Spacing.md,
-  },
-  cancelText: {
-    color: Colors.white,
-    fontSize: FontSize.md,
-    fontWeight: "500",
-  },
-  cancelIcon: {
-    marginRight: 8,
+  notes: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 8,
+    fontStyle: 'italic',
   },
 });

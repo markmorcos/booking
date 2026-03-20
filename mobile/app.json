@@ -1,44 +1,53 @@
 {
   "expo": {
-    "name": "Booking",
-    "slug": "booking",
+    "name": "Ma3ady",
+    "slug": "ma3ady",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "ma3ady",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#2563EB"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ma3ady.app",
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "CFBundleDisplayName": "Ma3ady",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "package": "tech.morcos.booking"
+      "package": "com.ma3ady.app",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      "@react-native-firebase/app",
+      "@react-native-google-signin/google-signin"
+    ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "2514c66f-7072-4b08-a26a-1fa4acaa03a7"
-      }
+      "router": { "origin": false },
+      "eas": { "projectId": "2514c66f-7072-4b08-a26a-1fa4acaa03a7" },
+      "apiBaseUrl": "https://api.ma3ady.com/api/v1"
     }
   }
 }

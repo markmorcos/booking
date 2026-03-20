@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Go
+backend/tmp/
+backend/booking-server
+
+# Mobile / Expo
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+mobile/ios/
+mobile/android/
+
+# Firebase credentials
+GoogleService-Info.plist
+google-services.json
+firebase-service-account.json
+
+# Secrets & keys
+*.pem
+*.p12
+*.p8
+*.key
+*.jks
+*.mobileprovision

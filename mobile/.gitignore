@@ -10,6 +10,7 @@ web-build/
 expo-env.d.ts
 
 # Native
+.kotlin/
 *.orig.*
 *.jks
 *.p8
@@ -35,5 +36,6 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# Android
-service-account-key.json
+# generated native folders
+/ios
+/android

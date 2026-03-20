@@ -10,14 +10,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run Rails DB migration job
+      - name: Run database migration job
         run: |
           echo "${{ secrets.RASPBERRY_PI_SSH_KEY }}" > /tmp/id_rsa
           chmod 600 /tmp/id_rsa
 
           ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa ${{ secrets.RASPBERRY_PI_USERNAME }}@${{ secrets.RASPBERRY_PI_HOST }} \
             "KUBECONFIG=\$HOME/.kube/config && \
-            kubectl delete job/rails-db-migrate -n booking && \
+            kubectl delete job/booking-db-migrate -n booking --ignore-not-found && \
             kubectl apply -f - && \
-            kubectl wait --for=condition=complete job/rails-db-migrate -n booking --timeout=120s && \
-            kubectl logs job/rails-db-migrate -n booking" < k8s/00-migration.yaml
+            kubectl wait --for=condition=complete job/booking-db-migrate -n booking --timeout=120s && \
+            kubectl logs job/booking-db-migrate -n booking" < backend/k8s/00-migrate.yaml
