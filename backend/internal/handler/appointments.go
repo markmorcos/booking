@@ -109,7 +109,10 @@ func (h *AppointmentsHandler) Cancel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req cancelRequest
-	json.NewDecoder(r.Body).Decode(&req)
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil && err.Error() != "EOF" {
+		writeError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
 
 	appt, err := h.appointmentService.Cancel(r.Context(), id, req.Reason)
 	if err != nil {

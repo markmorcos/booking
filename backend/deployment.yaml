@@ -1,18 +1,18 @@
 chartVersion: 0.2.8
 project:
-  name: "booking"
+  name: "ma3ady"
 repository:
   name: "markmorcos/booking"
   path: "backend"
 ingress:
-  host: booking.morcos.tech
+  host: api.ma3ady.com
   rules:
-    - host: booking.morcos.tech
+    - host: api.ma3ady.com
       path: /(.*)
       pathType: ImplementationSpecific
-      serviceName: booking-service
+      serviceName: ma3ady-service
 deployments:
-  - name: booking-deployment
+  - name: ma3ady-deployment
     image: markmorcos/booking
     env:
       - name: DATABASE_URL
@@ -42,8 +42,10 @@ deployments:
       - name: SMTP_DOMAIN
         valueFrom:
           secretKeyRef: { name: smtp-secrets, key: SMTP_DOMAIN }
+      - name: CORS_ALLOWED_ORIGINS
+        value: "https://ma3ady.com,https://www.ma3ady.com"
 services:
-  - name: booking-service
+  - name: ma3ady-service
     port: 8080
 jobs:
   - name: prepare-database-job

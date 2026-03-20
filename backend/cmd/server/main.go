@@ -34,7 +34,10 @@ func main() {
 	migrate := flag.Bool("migrate", false, "Run database migrations and exit")
 	flag.Parse()
 
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("failed to load config: %v", err)
+	}
 
 	db, err := sql.Open("postgres", cfg.DatabaseURL)
 	if err != nil {

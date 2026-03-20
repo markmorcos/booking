@@ -75,7 +75,7 @@ export default function ManageScreen() {
 
   const handleMaterialize = () => {
     if (!materializeFrom || !materializeTo) {
-      Alert.alert(t('common.error'), 'Please fill in both dates');
+      Alert.alert(t('common.error'), t('auth.fillBothDates'));
       return;
     }
     materialize.mutate(

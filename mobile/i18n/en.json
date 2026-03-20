@@ -16,7 +16,8 @@
   },
   "auth": {
     "signInWithGoogle": "Sign in with Google",
-    "welcome": "Welcome to Booking",
+    "welcome": "Welcome to Ma3ady",
+    "fillBothDates": "Please fill in both dates",
     "signingIn": "Signing in...",
     "signInError": "Failed to sign in. Please try again."
   },
