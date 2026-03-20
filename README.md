@@ -1,24 +1,31 @@
-# README
+# Booking App
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Multi-tenant appointment booking system with Go backend and React Native (Expo) mobile app.
 
-Things you may want to cover:
+## Backend (Go)
 
-* Ruby version
+```bash
+cd backend
+cp ../.env.example .env  # configure your env vars
+go run ./cmd/server      # starts on :8080
+go run ./cmd/server -migrate  # run DB migrations
+```
 
-* System dependencies
+## Mobile (Expo)
 
-* Configuration
+```bash
+cd mobile
+npm install
+npx expo start
+```
 
-* Database creation
+## Deployment
 
-* Database initialization
+Push to `main` triggers deployment via GitHub Actions to Kubernetes.
 
-* How to run the test suite
+## K8s Secrets Required
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- `database-secret`: DATABASE_URL
+- `firebase-secret`: FIREBASE_SERVICE_ACCOUNT_JSON
+- `whatsapp-secret`: WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID
+- `smtp-secrets`: SMTP_ADDRESS, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, SMTP_DOMAIN
